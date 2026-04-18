@@ -551,6 +551,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 // CONFIGURAÇÃO — ALTERAR APENAS AQUI
 // ═══════════════════════════════════════════════════════════════════
 const SHEET_ID = '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKrLn9ksYj-2obst7gj9zCG0G4pL0f9hkPJ8m4wxlnXdZuBFj7cncFMKiJQLelSKzk/exec'; // ← cola aqui o URL do Apps Script
 // Para obter o ID: abrir o Google Sheet → copiar o ID do URL
 // https://docs.google.com/spreadsheets/d/ESTE_É_O_ID/edit
 // Após publicar o Sheet (Ficheiro → Partilhar → Publicar na web)
@@ -848,7 +849,7 @@ function parseData(data) {
 async function init() {
   showScreen('loading');
 
-  if (!SHEET_ID || SHEET_ID === '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50') {
+  if (!SHEET_ID || SHEET_ID === 'SEU_GOOGLE_SHEET_ID_AQUI') {
     // Fallback — usar dados de exemplo embutidos
     loadFallbackData();
     return;
@@ -858,8 +859,16 @@ async function init() {
     const data = await fetchAllSheets();
     try { parseData(data); console.log("✅ parseData OK — participants:", participants.length, "days:", days.length); } catch(pe) { throw new Error("parseData falhou: " + pe.message + " | " + pe.stack); }
     syncTime = new Date().toLocaleTimeString('pt-PT', {hour:'2-digit',minute:'2-digit'});
+    // Load votes from Apps Script if available
+    if (window._appsScriptData && window._appsScriptData.votes) {
+      applyVotes(window._appsScriptData.votes);
+    }
+    if (window._appsScriptData && window._appsScriptData.checks) {
+      window._savedChecks = window._appsScriptData.checks;
+    }
     renderWelcome();
     showScreen('welcome');
+    console.log("✅ App iniciada — utilizadores:", participants.map(p=>p.nome));
   } catch(e) {
     document.getElementById("err-detail").textContent = e.message + " | Stack: " + e.stack;
     showScreen('error');
@@ -1026,7 +1035,7 @@ function renderStateRows() {
   document.getElementById('state-rows').innerHTML = stateItems.map((s, i) => `
     <div class="state-row">
       <span class="state-lbl">${s.label}</span>
-      <button class="tog ${s.on?'on':'off'}" onclick="stateItems[${i}].on=!stateItems[${i}].on;renderStateRows()"></button>
+      <button class="tog ${s.on?'on':'off'}" onclick="stateItems[${i}].on=!stateItems[${i}].on;renderStateRows();apiPost({action:'state',key:stateItems[${i}].key||'',value:stateItems[${i}].on?'TRUE':'FALSE'})"></button>
     </div>`).join('');
 }
 
@@ -1056,8 +1065,10 @@ function renderParticipants() {
 }
 
 function addP() {
-  participants.push({ ini: '🌏', nome: 'Novo participante', tipo: 'adulto', icon: '🌏', pago: false });
+  const p = { ini: '🌏', nome: 'Novo participante', tipo: 'adulto', icon: '🌏', pago: false };
+  participants.push(p);
   renderParticipants();
+  apiPost({ action: 'add_participant', nome: p.nome, tipo: p.tipo, icon: p.icon });
 }
 
 // ═══ BUDGET BARS ═══
@@ -1112,9 +1123,9 @@ function renderItin() {
       <div class="dbody" id="db-${i}">
         ${d.isTravel ? `<button class="mapbtn" onclick="goToMap()">Ver deslocação no mapa →</button>` : ''}
         ${d.transfer ? `<div class="tr-strip"><span class="tr-badge">Transfer</span><span style="font-size:11px;color:var(--gray)">${d.transfer.de} → ${d.transfer.para}</span>${d.transfer.didi ? `<a href="https://www.didiglobal.com" target="_blank" style="font-size:10px;padding:2px 8px;border-radius:20px;text-decoration:none;background:#FF6600;color:#fff;font-weight:500">Didi</a>` : ''}</div>` : ''}
-        ${d.atividades.map(a => a.tipo === 'ativ' ? `
+        ${d.atividades.map((a, ai) => a.tipo === 'ativ' ? `
         <div class="arow">
-          <input type="checkbox" class="acb">
+          <input type="checkbox" class="acb" ${getCheck(i,ai)?'checked':''} onchange="saveCheckRemote(${i},${ai},this.checked)">
           <div>
             <div class="atext">${a.txt}</div>
             ${a.link ? `<a class="alink" href="${a.link}" target="_blank">Site oficial →</a>` : ''}
@@ -1150,14 +1161,14 @@ function closeAddPanel() {
 function saveActivity() {
   const di = parseInt(document.getElementById('ap-day').value);
   const desc = document.getElementById('ap-desc').value.trim();
+  const tipo = document.getElementById('ap-tipo').value;
+  const link = document.getElementById('ap-link').value.trim() || '';
   if (!desc) return;
-  days[di].atividades.push({
-    txt: desc,
-    tipo: document.getElementById('ap-tipo').value,
-    link: document.getElementById('ap-link').value.trim() || ''
-  });
+  days[di].atividades.push({ txt: desc, tipo, link });
   closeAddPanel();
   renderItin();
+  // Save to Apps Script
+  apiPost({ action: 'add_activity', day_idx: di, txt: desc, tipo, link });
 }
 document.getElementById('fab').onclick = openAddPanel;
 
@@ -1211,13 +1222,17 @@ function saveHotel(ci) {
   const link = document.getElementById('hl-'+ci).value || '';
   hotels[ci].opcoes.push({ nome, det: 'Nova opção', preco: preco ? preco+'€' : '—', link, votos: [] });
   renderHotels();
+  apiPost({ action: 'add_hotel', cidade: hotels[ci].cidade, nome, preco, link });
 }
 function vote(ci, oi) {
   if (!currentUser) return;
   const o = hotels[ci].opcoes[oi];
   const idx = o.votos.indexOf(currentUser.icon);
-  if (idx > -1) o.votos.splice(idx, 1); else o.votos.push(currentUser.icon);
+  const adding = idx === -1;
+  if (adding) o.votos.push(currentUser.icon); else o.votos.splice(idx, 1);
   renderHotels();
+  // Save to Apps Script
+  apiPost({ action: 'vote', cidade_idx: ci, hotel_idx: oi, user_icon: currentUser.icon, add: adding });
 }
 
 // ═══ MAP ═══
@@ -1285,10 +1300,14 @@ function cycleStatus(i) {
   else if (c.real) { c.real = false; }
   else { c.pago = true; c.real = false; }
   renderCosts();
+  // Save to Apps Script — +1 for header row in sheet
+  apiPost({ action: 'cost_status', row_idx: i + 1, pago: c.pago, real: c.real });
 }
 function addCost() {
-  costs.push({ nome: 'Nova despesa', pp_adult: 0, pp_child: 0, pago: false, real: false });
+  const nova = { nome: 'Nova despesa', pp_adult: 0, pp_child: 0, pago: false, real: false };
+  costs.push(nova);
   renderCosts();
+  apiPost({ action: 'add_cost', nome: nova.nome, pp_adult: 0, pp_child: 0 });
 }
 
 // ═══ CONVERTER ═══
@@ -1314,6 +1333,31 @@ function renderPrices() {
 // ═══ FLIGHTS (static, from itinerary planning) ═══
 function renderFlights() {
   // Flights are shown in the Mapa section as first/last map stops
+}
+
+// ═══ APPLY REMOTE DATA ═══
+function applyVotes(votes) {
+  // votes: { "0|0": ["🧭","📸"], "0|1": [] ... }
+  Object.entries(votes).forEach(([key, icons]) => {
+    const [ci, oi] = key.split('|').map(Number);
+    if (hotels[ci] && hotels[ci].opcoes[oi]) {
+      hotels[ci].opcoes[oi].votos = icons;
+    }
+  });
+}
+
+function getCheck(dayIdx, actIdx) {
+  if (!window._savedChecks) return false;
+  if (!currentUser) return false;
+  return window._savedChecks[dayIdx + '|' + actIdx + '|' + currentUser.icon] === true;
+}
+
+function saveCheckRemote(dayIdx, actIdx, checked) {
+  if (!window._savedChecks) window._savedChecks = {};
+  if (currentUser) {
+    window._savedChecks[dayIdx + '|' + actIdx + '|' + currentUser.icon] = checked;
+  }
+  apiPost({ action: 'check', day_idx: dayIdx, act_idx: actIdx, user_icon: currentUser?.icon, checked });
 }
 
 // ═══ RENDER ALL ═══

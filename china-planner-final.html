@@ -584,25 +584,23 @@ function sheetUrl(sheetName) {
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
 }
 
-function parseCSV(text) {
-  // Split into tokens respecting quoted fields
-  function tokenize(line) {
-    const vals = [];
-    let cur = '', inQ = false, i = 0;
-    while (i < line.length) {
-      const ch = line[i];
-      if (ch === '"') {
-        if (inQ && line[i+1] === '"') { cur += '"'; i += 2; continue; }
-        inQ = !inQ; i++; continue;
-      }
-      if (ch === ',' && !inQ) { vals.push(cur); cur = ''; i++; continue; }
-      cur += ch; i++;
+function tokenizeCSVLine(line) {
+  const vals = [];
+  let cur = '', inQ = false, i = 0;
+  while (i < line.length) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQ && line[i+1] === '"') { cur += '"'; i += 2; continue; }
+      inQ = !inQ; i++; continue;
     }
-    vals.push(cur);
-    return vals.map(v => v.trim());
+    if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; i++; continue; }
+    cur += ch; i++;
   }
+  vals.push(cur.trim());
+  return vals;
+}
 
-  // Split lines respecting quoted newlines
+function splitCSVRows(text) {
   const rows = [];
   let cur = '', inQ = false;
   for (let i = 0; i < text.length; i++) {
@@ -615,23 +613,21 @@ function parseCSV(text) {
     } else { cur += ch; }
   }
   if (cur.trim()) rows.push(cur);
+  return rows;
+}
 
-  if (rows.length < 2) return [];
-  // Skip decorative title rows — find the real header row (has multiple non-empty cols)
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(rows.length, 5); i++) {
-    const cols = tokenize(rows[i]);
-    const nonEmpty = cols.filter(c => c.length > 0);
-    if (nonEmpty.length >= 2 && !cols[0].includes(' ') && cols[0] === cols[0].toLowerCase()) {
-      headerIdx = i; break;
-    }
-    if (nonEmpty.length >= 2 && cols[1] !== '') { headerIdx = i; }
-  }
-  const headers = tokenize(rows[headerIdx]);
-  return rows.slice(headerIdx + 1).map(line => {
-    const vals = tokenize(line);
+function parseCSV(text) {
+  const rows = splitCSVRows(text);
+  if (rows.length < 1) return [];
+  // Always use positional keys — col0, col1, col2...
+  // Find first non-empty row to determine column count
+  const firstRow = tokenizeCSVLine(rows[0]);
+  const numCols = Math.max(...rows.slice(0,3).map(r => tokenizeCSVLine(r).length));
+  const headers = Array.from({length: numCols}, (_, i) => 'col' + i);
+  return rows.map(line => {
+    const vals = tokenizeCSVLine(line);
     const obj = {};
-    headers.forEach((h, i) => { if(h) obj[h] = vals[i] !== undefined ? vals[i] : ''; });
+    headers.forEach((h, i) => { obj[h] = vals[i] !== undefined ? vals[i] : ''; });
     return obj;
   }).filter(obj => Object.values(obj).some(v => v !== ''));
 }
@@ -654,16 +650,23 @@ async function fetchAllSheets() {
 
 // ═══ DATA PARSING ═══
 function parseData(data) {
-  // Config
+  // Config — col0=chave, col1=valor (skip title rows)
   const cfg = {};
-  (data.config || []).forEach(r => { if(r.chave) cfg[r.chave] = r.valor; });
+  (data.config || []).forEach(r => {
+    const k = (r.col0||'').trim();
+    const v = (r.col1||'').trim();
+    if (k && k !== 'chave' && !k.includes('CONFIGURA') && !k.includes(' ')) cfg[k] = v;
+  });
 
-  // Participantes
-  participants = (data.participantes || []).filter(r => r.nome).map(r => ({
-    nome: r.nome,
-    tipo: (r.tipo||'adulto').toLowerCase(),
-    icon: r.icon || '🌏',
-    pago: r.pago === true || r.pago === 'TRUE' || r.pago === 'true' || r.pago === 1
+  // Participantes — col0=nome, col1=tipo, col2=icon, col3=pago
+  participants = (data.participantes || []).filter(r => {
+    const n = (r.col0||'').trim();
+    return n && n !== 'nome' && !n.includes('PARTICIPANTES');
+  }).map(r => ({
+    nome: (r.col0||'').trim(),
+    tipo: ((r.col1||'adulto').trim()).toLowerCase(),
+    icon: (r.col2||'🌏').trim(),
+    pago: (r.col3||'').trim() === 'TRUE'
   }));
 
   // Itinerário — parse posicional (col0=dia, col1=data, col2=local, col3=hanzi,
@@ -845,7 +848,7 @@ function parseData(data) {
 async function init() {
   showScreen('loading');
 
-  if (!SHEET_ID || SHEET_ID === 'SEU_GOOGLE_SHEET_ID_AQUI') {
+  if (!SHEET_ID || SHEET_ID === 'NAO_USAR_FALLBACK') {
     // Fallback — usar dados de exemplo embutidos
     loadFallbackData();
     return;

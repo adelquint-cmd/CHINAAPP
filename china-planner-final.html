@@ -550,7 +550,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 // ═══════════════════════════════════════════════════════════════════
 // CONFIGURAÇÃO — ALTERAR APENAS AQUI
 // ═══════════════════════════════════════════════════════════════════
-const SHEET_ID = '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50';
+const SHEET_ID = 'SEU_GOOGLE_SHEET_ID_AQUI';
 // Para obter o ID: abrir o Google Sheet → copiar o ID do URL
 // https://docs.google.com/spreadsheets/d/ESTE_É_O_ID/edit
 // Após publicar o Sheet (Ficheiro → Partilhar → Publicar na web)
@@ -617,8 +617,18 @@ function parseCSV(text) {
   if (cur.trim()) rows.push(cur);
 
   if (rows.length < 2) return [];
-  const headers = tokenize(rows[0]);
-  return rows.slice(1).map(line => {
+  // Skip decorative title rows — find the real header row (has multiple non-empty cols)
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(rows.length, 5); i++) {
+    const cols = tokenize(rows[i]);
+    const nonEmpty = cols.filter(c => c.length > 0);
+    if (nonEmpty.length >= 2 && !cols[0].includes(' ') && cols[0] === cols[0].toLowerCase()) {
+      headerIdx = i; break;
+    }
+    if (nonEmpty.length >= 2 && cols[1] !== '') { headerIdx = i; }
+  }
+  const headers = tokenize(rows[headerIdx]);
+  return rows.slice(headerIdx + 1).map(line => {
     const vals = tokenize(line);
     const obj = {};
     headers.forEach((h, i) => { if(h) obj[h] = vals[i] !== undefined ? vals[i] : ''; });
@@ -782,7 +792,7 @@ function parseData(data) {
 async function init() {
   showScreen('loading');
 
-  if (!SHEET_ID || SHEET_ID === 'SEU_GOOGLE_SHEET_ID_AQUI') {
+  if (!SHEET_ID || SHEET_ID === '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50') {
     // Fallback — usar dados de exemplo embutidos
     loadFallbackData();
     return;

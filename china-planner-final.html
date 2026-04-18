@@ -550,7 +550,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 // ═══════════════════════════════════════════════════════════════════
 // CONFIGURAÇÃO — ALTERAR APENAS AQUI
 // ═══════════════════════════════════════════════════════════════════
-const SHEET_ID = 'SEU_GOOGLE_SHEET_ID_AQUI';
+const SHEET_ID = '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50';
 // Para obter o ID: abrir o Google Sheet → copiar o ID do URL
 // https://docs.google.com/spreadsheets/d/ESTE_É_O_ID/edit
 // Após publicar o Sheet (Ficheiro → Partilhar → Publicar na web)
@@ -666,89 +666,142 @@ function parseData(data) {
     pago: r.pago === true || r.pago === 'TRUE' || r.pago === 'true' || r.pago === 1
   }));
 
-  // Itinerário
+  // Itinerário — parse posicional (col0=dia, col1=data, col2=local, col3=hanzi,
+  // col4=viagem, col5=atividade, col6=tipo_ativ, col7=link, col8=cn_hanzi,
+  // col9=cn_pinyin, col10=cn_pt, col11=cn_addr, col12=transfer,
+  // col13=transfer_de, col14=transfer_para, col15=didi)
   days = [];
   let currentDay = null;
-  (data.itinerario || []).forEach(r => {
-    if (r.dia && r.local) {
+  const itin = data.itinerario || [];
+  // Find first real data row — skip title/header rows (where col0 is not a number)
+  itin.forEach(r => {
+    // Get values by position using object values
+    const vals = Object.values(r);
+    const col0 = (vals[0]||'').trim();
+    const col1 = (vals[1]||'').trim();
+    const col2 = (vals[2]||'').trim();
+    const col3 = (vals[3]||'').trim();
+    const col4 = (vals[4]||'').trim();
+    const col5 = (vals[5]||'').trim();
+    const col6 = (vals[6]||'').trim();
+    const col7 = (vals[7]||'').trim();
+    const col8 = (vals[8]||'').trim();
+    const col9 = (vals[9]||'').trim();
+    const col10 = (vals[10]||'').trim();
+    const col11 = (vals[11]||'').trim();
+    const col12 = (vals[12]||'').trim();
+    const col13 = (vals[13]||'').trim();
+    const col14 = (vals[14]||'').trim();
+    const col15 = (vals[15]||'').trim();
+
+    const diaNum = parseInt(col0);
+    if (!isNaN(diaNum) && diaNum > 0 && col2) {
+      // This is a day row
       currentDay = {
-        dia: parseInt(r.dia),
-        data: r.data || '',
-        local: r.local,
-        hanzi: r.hanzi || '',
-        isTravel: r.viagem === true || r.viagem === 'TRUE' || r.viagem === 'true',
+        dia: diaNum,
+        data: col1,
+        local: col2,
+        hanzi: col3,
+        isTravel: col4 === 'TRUE',
         atividades: [],
-        transfer: r.transfer ? { de: r.transfer_de||'', para: r.transfer_para||'', didi: r.didi === 'TRUE' || r.didi === true } : null
+        transfer: col12 === 'TRUE' ? { de: col13, para: col14, didi: col15 === 'TRUE' } : null
       };
       days.push(currentDay);
-    }
-    if (currentDay && r.atividade) {
+    } else if (currentDay && col5) {
+      // This is an activity row
       currentDay.atividades.push({
-        txt: r.atividade,
-        tipo: r.tipo_ativ || 'info',
-        link: r.link || '',
-        cn: r.cn_hanzi ? { big: r.cn_hanzi, pinyin: r.cn_pinyin||'', pt: r.cn_pt||'', addr: r.cn_addr||'' } : null
+        txt: col5,
+        tipo: col6 || 'info',
+        link: col7,
+        cn: col8 ? { big: col8, pinyin: col9, pt: col10, addr: col11 } : null
       });
     }
   });
 
-  // Hotéis
+  // Hotéis — col0=cidade, col1=noites, col2=nome_hotel, col3=detalhe, col4=preco, col5=link, col6=votos
   hotels = [];
   let currentHotel = null;
   (data.hoteis || []).forEach(r => {
-    if (r.cidade) {
-      currentHotel = { cidade: r.cidade, noites: r.noites||'', opcoes: [] };
+    const vals = Object.values(r);
+    const col0 = (vals[0]||'').trim();
+    const col1 = (vals[1]||'').trim();
+    const col2 = (vals[2]||'').trim();
+    const col3 = (vals[3]||'').trim();
+    const col4 = (vals[4]||'').trim();
+    const col5 = (vals[5]||'').trim();
+    const col6 = (vals[6]||'').trim();
+    if (col0 && !col2 && col0 !== 'cidade' && !col0.includes('ALOJAMENTO')) {
+      currentHotel = { cidade: col0, noites: col1, opcoes: [] };
       hotels.push(currentHotel);
-    }
-    if (currentHotel && r.nome_hotel) {
+    } else if (currentHotel && col2 && col2 !== 'nome_hotel') {
       currentHotel.opcoes.push({
-        nome: r.nome_hotel,
-        det: r.detalhe||'',
-        preco: r.preco||'—',
-        link: r.link||'',
-        votos: r.votos ? r.votos.split(',').map(v=>v.trim()).filter(Boolean) : []
+        nome: col2, det: col3, preco: col4||'—', link: col5,
+        votos: col6 ? col6.split(',').map(v=>v.trim()).filter(Boolean) : []
       });
     }
   });
 
-  // Mapa
-  mapStops = (data.mapa || []).filter(r => r.cidade).map(r => ({
-    cidade: r.cidade,
-    sub: r.sub||'',
-    filled: r.filled !== false && r.filled !== 'FALSE',
-    travel: r.tipo_transp ? {
-      tipo: r.tipo_transp,
-      nome: r.nome_transp||'',
-      p1: r.partida||'',
-      p2: r.chegada||'',
-      dur: r.duracao||'',
-      custo: r.custo||'',
-      link: r.link_reserva||'',
-      transfer: r.transfer_info||''
-    } : null
-  }));
+  // Mapa — col0=cidade, col1=sub, col2=filled, col3=tipo_transp, col4=nome_transp,
+  // col5=partida, col6=chegada, col7=duracao, col8=custo, col9=link_reserva, col10=transfer_info
+  mapStops = (data.mapa || []).filter(r => {
+    const v = Object.values(r);
+    const c0 = (v[0]||'').trim();
+    return c0 && c0 !== 'cidade' && !c0.includes('MAPA') && !c0.includes('PERCURSO');
+  }).map(r => {
+    const vals = Object.values(r);
+    const col0 = (vals[0]||'').trim();
+    const col1 = (vals[1]||'').trim();
+    const col2 = (vals[2]||'').trim();
+    const col3 = (vals[3]||'').trim();
+    const col4 = (vals[4]||'').trim();
+    const col5 = (vals[5]||'').trim();
+    const col6 = (vals[6]||'').trim();
+    const col7 = (vals[7]||'').trim();
+    const col8 = (vals[8]||'').trim();
+    const col9 = (vals[9]||'').trim();
+    const col10 = (vals[10]||'').trim();
+    return {
+      cidade: col0, sub: col1, filled: col2 !== 'FALSE',
+      travel: col3 ? { tipo: col3, nome: col4, p1: col5, p2: col6, dur: col7, custo: col8, link: col9, transfer: col10 } : null
+    };
+  });
 
   // Custos
-  costs = (data.custos || []).filter(r => r.nome).map(r => ({
-    nome: r.nome,
-    pp_adult: parseFloat(r.pp_adulto)||0,
-    pp_child: parseFloat(r.pp_crianca)||0,
-    pago: r.pago === true || r.pago === 'TRUE',
-    real: r.real === true || r.real === 'TRUE'
-  }));
+  // Custos — col0=nome, col1=pp_adulto, col2=pp_crianca, col3=pago, col4=real
+  costs = (data.custos || []).filter(r => {
+    const v = Object.values(r);
+    const c0 = (v[0]||'').trim();
+    return c0 && c0 !== 'nome' && !c0.includes('CUSTOS') && !c0.includes('preencher') && !c0.includes('pp_adulto');
+  }).map(r => {
+    const vals = Object.values(r);
+    return {
+      nome: (vals[0]||'').trim(),
+      pp_adult: parseFloat(vals[1])||0,
+      pp_child: parseFloat(vals[2])||0,
+      pago: (vals[3]||'').trim() === 'TRUE',
+      real: (vals[4]||'').trim() === 'TRUE'
+    };
+  });
 
-  // Câmbio
-  const cambioRow = (data.cambio || []).find(r => r.taxa);
-  const taxa = cambioRow ? parseFloat(cambioRow.taxa) : 7.85;
+  // Câmbio — find row with numeric value in col1
+  const cambioRow = (data.cambio || []).find(r => {
+    const vals = Object.values(r);
+    return !isNaN(parseFloat(vals[1])) && parseFloat(vals[1]) > 1;
+  });
+  const taxa = cambioRow ? parseFloat(Object.values(cambioRow)[1]) : 7.85;
   if (!isNaN(taxa) && taxa > 0) {
     document.getElementById('rate-val').value = taxa.toFixed(2);
   }
 
   // Preços de referência
-  priceRef = (data.precos || []).filter(r => r.item).map(r => ({
-    item: r.item,
-    cny: parseFloat(r.preco_cny)||0
-  }));
+  priceRef = (data.precos || []).filter(r => {
+    const vals = Object.values(r);
+    const c0 = (vals[0]||'').trim();
+    return c0 && c0 !== 'item' && !c0.includes('PREÇOS') && !c0.includes('preco_cny');
+  }).map(r => {
+    const vals = Object.values(r);
+    return { item: (vals[0]||'').trim(), cny: parseFloat(vals[1])||0 };
+  });
 
   // State items — from config
   stateItems = [
@@ -792,7 +845,7 @@ function parseData(data) {
 async function init() {
   showScreen('loading');
 
-  if (!SHEET_ID || SHEET_ID === '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50') {
+  if (!SHEET_ID || SHEET_ID === 'SEU_GOOGLE_SHEET_ID_AQUI') {
     // Fallback — usar dados de exemplo embutidos
     loadFallbackData();
     return;

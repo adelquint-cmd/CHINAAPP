@@ -646,8 +646,8 @@ async function fetchSheet(name) {
 async function fetchAllSheets() {
   const results = {};
   for (const [key, name] of Object.entries(SHEET_NAMES)) {
-    try { results[key] = await fetchSheet(name); }
-    catch(e) { results[key] = []; console.warn(`Aba "${name}" não carregada:`, e.message); }
+    try { results[key] = await fetchSheet(name); console.log(`✅ "${name}": ${results[key].length} rows`, results[key][0]); }
+    catch(e) { results[key] = []; console.error(`❌ "${name}" FALHOU:`, e.message, e.stack); }
   }
   return results;
 }
@@ -800,12 +800,12 @@ async function init() {
 
   try {
     const data = await fetchAllSheets();
-    parseData(data);
+    try { parseData(data); console.log("✅ parseData OK — participants:", participants.length, "days:", days.length); } catch(pe) { throw new Error("parseData falhou: " + pe.message + " | " + pe.stack); }
     syncTime = new Date().toLocaleTimeString('pt-PT', {hour:'2-digit',minute:'2-digit'});
     renderWelcome();
     showScreen('welcome');
   } catch(e) {
-    document.getElementById('err-detail').textContent = e.message;
+    document.getElementById("err-detail").textContent = e.message + " | Stack: " + e.stack;
     showScreen('error');
   }
 }

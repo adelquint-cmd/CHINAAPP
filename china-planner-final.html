@@ -551,7 +551,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 // CONFIGURAÇÃO — ALTERAR APENAS AQUI
 // ═══════════════════════════════════════════════════════════════════
 const SHEET_ID = '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKrLn9ksYj-2obst7gj9zCG0G4pL0f9hkPJ8m4wxlnXdZuBFj7cncFMKiJQLelSKzk/exec'; // ← cola aqui o URL do Apps Script
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKrLn9ksYj-2obst7gj9zCG0G4pL0f9hkPJ8m4wxlnXdZuBFj7cncFMKiJQLelSKzk/exec';
 // Para obter o ID: abrir o Google Sheet → copiar o ID do URL
 // https://docs.google.com/spreadsheets/d/ESTE_É_O_ID/edit
 // Após publicar o Sheet (Ficheiro → Partilhar → Publicar na web)
@@ -641,12 +641,47 @@ async function fetchSheet(name) {
 }
 
 async function fetchAllSheets() {
+  if (APPS_SCRIPT_URL && !APPS_SCRIPT_URL.includes('SEU_')) {
+    console.log('📡 A usar Apps Script...');
+    const res = await fetch(APPS_SCRIPT_URL + '?action=all');
+    const json = await res.json();
+    if (!json.ok) throw new Error('Apps Script erro: ' + json.error);
+    console.log('✅ Apps Script OK');
+    window._appsScriptData = json.data;
+    return convertAppsScriptData(json.data);
+  }
+  // Fallback CSV
   const results = {};
   for (const [key, name] of Object.entries(SHEET_NAMES)) {
     try { results[key] = await fetchSheet(name); console.log(`✅ "${name}": ${results[key].length} rows`, results[key][0]); }
-    catch(e) { results[key] = []; console.error(`❌ "${name}" FALHOU:`, e.message, e.stack); }
+    catch(e) { results[key] = []; console.error(`❌ "${name}" FALHOU:`, e.message); }
   }
   return results;
+}
+
+function convertAppsScriptData(d) {
+  function toPos(rows) {
+    return (rows||[]).map(row => {
+      const arr = Array.isArray(row) ? row : Object.values(row);
+      const obj = {};
+      arr.forEach((v,i) => { obj['col'+i] = String(v===null||v===undefined?'':v); });
+      return obj;
+    });
+  }
+  return {
+    config: toPos(d.config), participantes: toPos(d.participantes),
+    itinerario: toPos(d.itinerario), hoteis: toPos(d.hoteis),
+    mapa: toPos(d.mapa), custos: toPos(d.custos),
+    cambio: toPos(d.cambio), precos: toPos(d.precos)
+  };
+}
+
+async function apiPost(body) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('SEU_')) return null;
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, { method:'POST', body: JSON.stringify(body) });
+    return await res.json();
+  } catch(e) { console.warn('apiPost falhou:', e.message); return null; }
 }
 
 // ═══ DATA PARSING ═══
@@ -1065,10 +1100,9 @@ function renderParticipants() {
 }
 
 function addP() {
-  const p = { ini: '🌏', nome: 'Novo participante', tipo: 'adulto', icon: '🌏', pago: false };
-  participants.push(p);
-  renderParticipants();
-  apiPost({ action: 'add_participant', nome: p.nome, tipo: p.tipo, icon: p.icon });
+  const p={ini:'🌏',nome:'Novo participante',tipo:'adulto',icon:'🌏',pago:false};
+  participants.push(p); renderParticipants();
+  apiPost({action:'add_participant',nome:p.nome,tipo:p.tipo,icon:p.icon});
 }
 
 // ═══ BUDGET BARS ═══
@@ -1304,10 +1338,9 @@ function cycleStatus(i) {
   apiPost({ action: 'cost_status', row_idx: i + 1, pago: c.pago, real: c.real });
 }
 function addCost() {
-  const nova = { nome: 'Nova despesa', pp_adult: 0, pp_child: 0, pago: false, real: false };
-  costs.push(nova);
-  renderCosts();
-  apiPost({ action: 'add_cost', nome: nova.nome, pp_adult: 0, pp_child: 0 });
+  const nova={nome:'Nova despesa',pp_adult:0,pp_child:0,pago:false,real:false};
+  costs.push(nova); renderCosts();
+  apiPost({action:'add_cost',nome:nova.nome,pp_adult:0,pp_child:0});
 }
 
 // ═══ CONVERTER ═══
@@ -1358,6 +1391,22 @@ function saveCheckRemote(dayIdx, actIdx, checked) {
     window._savedChecks[dayIdx + '|' + actIdx + '|' + currentUser.icon] = checked;
   }
   apiPost({ action: 'check', day_idx: dayIdx, act_idx: actIdx, user_icon: currentUser?.icon, checked });
+}
+
+function applyVotes(votes) {
+  Object.entries(votes||{}).forEach(([key,icons]) => {
+    const [ci,oi] = key.split('|').map(Number);
+    if (hotels[ci]&&hotels[ci].opcoes[oi]) hotels[ci].opcoes[oi].votos = Array.isArray(icons)?icons:String(icons).split(',').filter(Boolean);
+  });
+}
+function getCheck(di,ai) {
+  if (!window._savedChecks||!currentUser) return false;
+  return window._savedChecks[di+'|'+ai+'|'+currentUser.icon]===true;
+}
+function saveCheckRemote(di,ai,checked) {
+  if (!window._savedChecks) window._savedChecks={};
+  if (currentUser) window._savedChecks[di+'|'+ai+'|'+currentUser.icon]=checked;
+  apiPost({action:'check',day_idx:di,act_idx:ai,user_icon:currentUser?.icon,checked});
 }
 
 // ═══ RENDER ALL ═══

@@ -25,14 +25,14 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .screen.active{display:block}
 
 /* LOADING */
-#scr-loading{min-height:100vh;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+#scr-loading{min-height:100vh;background:var(--red);flex-direction:column;align-items:center;justify-content:center;gap:1rem}#scr-loading.active{display:flex!important}
 .load-hz{font-family:var(--font-cn);font-size:80px;color:rgba(255,255,255,0.15);font-weight:700}
 .load-txt{font-size:14px;color:rgba(255,255,255,0.7)}
 .load-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* WELCOME */
-#scr-welcome{min-height:100vh;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden}
+#scr-welcome{min-height:100vh;background:var(--red);flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden}#scr-welcome.active{display:flex!important}
 .w-bg-hz{position:absolute;font-family:var(--font-cn);font-size:220px;color:rgba(255,255,255,0.05);font-weight:700;pointer-events:none;user-select:none;line-height:1}
 .w-logo{position:relative;text-align:center;margin-bottom:1.5rem}
 .w-title{font-size:30px;font-weight:600;color:#fff;letter-spacing:-0.5px}
@@ -56,7 +56,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .w-loading-msg{font-size:12px;color:rgba(255,255,255,0.55);text-align:center;margin-top:0.75rem}
 
 /* ERROR */
-#scr-error{min-height:100vh;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}
+#scr-error{min-height:100vh;background:var(--red);flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}#scr-error.active{display:flex!important}
 .err-icon{font-size:48px;margin-bottom:1rem}
 .err-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:0.5rem}
 .err-msg{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:1.5rem}
@@ -848,7 +848,7 @@ function parseData(data) {
 async function init() {
   showScreen('loading');
 
-  if (!SHEET_ID || SHEET_ID === 'NAO_USAR_FALLBACK') {
+  if (!SHEET_ID || SHEET_ID === '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50') {
     // Fallback — usar dados de exemplo embutidos
     loadFallbackData();
     return;

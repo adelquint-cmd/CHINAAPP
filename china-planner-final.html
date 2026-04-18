@@ -581,23 +581,34 @@ let extraVotes = {}; // votes added locally
 
 // ═══ GOOGLE SHEETS FETCH ═══
 function sheetUrl(sheetName) {
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { vals.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    vals.push(cur);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h] = (vals[i] || '').replace(/^"|"$/g, '').trim(); });
+    return obj;
+  });
 }
 
 async function fetchSheet(name) {
   const res = await fetch(sheetUrl(name));
   if (!res.ok) throw new Error(`HTTP ${res.status} ao carregar aba "${name}"`);
   const text = await res.text();
-  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
-  if (!json.table || !json.table.rows) return [];
-  const cols = json.table.cols.map(c => c.label || c.id);
-  return json.table.rows.map(row => {
-    const obj = {};
-    cols.forEach((col, i) => {
-      obj[col] = row.c[i] ? (row.c[i].v !== null ? row.c[i].v : '') : '';
-    });
-    return obj;
-  });
+  return parseCSV(text);
 }
 
 async function fetchAllSheets() {

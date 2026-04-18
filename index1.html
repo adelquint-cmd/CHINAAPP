@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>China 2026 · Planeador</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#C0392B;--redl:#FAEBE9;--redd:#7B241C;--redb:#E8D5D3;
+  --gold:#C9960C;--goldl:#FEF3DC;--goldd:#7D5A00;
+  --ink:#1C1008;--paper:#FDFAF5;
+  --gray:#6B6560;--grayl:#F5F3EF;--grayb:#E8E5E0;
+  --green:#2E7D32;--greenl:#E8F5E9;
+  --blue:#1565C0;--bluel:#E3F2FD;
+  --border:rgba(0,0,0,0.1);--shadow:0 2px 12px rgba(0,0,0,0.07);
+  --radius:12px;--radius-sm:8px;
+  --font:'DM Sans',sans-serif;--font-cn:'Noto Serif SC',serif;
+}
+body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100vh}
+
+/* SCREENS */
+.screen{display:none}
+.screen.active{display:block}
+
+/* LOADING */
+#scr-loading{min-height:100vh;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+.load-hz{font-family:var(--font-cn);font-size:80px;color:rgba(255,255,255,0.15);font-weight:700}
+.load-txt{font-size:14px;color:rgba(255,255,255,0.7)}
+.load-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* WELCOME */
+#scr-welcome{min-height:100vh;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden}
+.w-bg-hz{position:absolute;font-family:var(--font-cn);font-size:220px;color:rgba(255,255,255,0.05);font-weight:700;pointer-events:none;user-select:none;line-height:1}
+.w-logo{position:relative;text-align:center;margin-bottom:1.5rem}
+.w-title{font-size:30px;font-weight:600;color:#fff;letter-spacing:-0.5px}
+.w-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px}
+.w-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:1.5rem;width:100%;max-width:380px}
+.w-q{font-size:14px;color:rgba(255,255,255,0.85);margin-bottom:1rem;font-weight:500}
+.pax-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem}
+.pax-opt{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(255,255,255,0.08);transition:all 0.15s}
+.pax-opt:hover{background:rgba(255,255,255,0.14)}
+.pax-opt.sel{border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.18)}
+.pax-icon{font-size:26px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pax-info{flex:1}
+.pax-name{font-size:14px;font-weight:500;color:#fff}
+.pax-role{font-size:11px;color:rgba(255,255,255,0.6);margin-top:1px}
+.pax-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+.ps-ok{background:rgba(46,125,50,0.4);color:#A5D6A7}
+.ps-pend{background:rgba(192,57,43,0.3);color:#FFCDD2}
+.w-enter{width:100%;background:#fff;color:var(--red);border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;font-family:var(--font);cursor:pointer;margin-top:0.5rem}
+.w-enter:disabled{opacity:0.4;cursor:not-allowed}
+.w-enter:not(:disabled):active{transform:scale(0.98)}
+.w-loading-msg{font-size:12px;color:rgba(255,255,255,0.55);text-align:center;margin-top:0.75rem}
+
+/* ERROR */
+#scr-error{min-height:100vh;background:var(--red);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}
+.err-icon{font-size:48px;margin-bottom:1rem}
+.err-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:0.5rem}
+.err-msg{font-size:13px;color:rgba(255,255,255,0.7);line-height:1.6;margin-bottom:1.5rem}
+.err-code{font-size:11px;color:rgba(255,255,255,0.4);font-family:monospace;background:rgba(0,0,0,0.2);padding:0.5rem 1rem;border-radius:8px;margin-bottom:1.5rem;word-break:break-all}
+.err-btn{background:#fff;color:var(--red);border:none;border-radius:10px;padding:12px 2rem;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer}
+
+/* MAIN */
+#scr-main{max-width:440px;margin:0 auto;background:var(--paper);min-height:100vh;position:relative;box-shadow:0 0 40px rgba(0,0,0,0.12)}
+
+.header{background:var(--red);overflow:hidden;position:relative}
+.hdr-bg{position:absolute;right:-8px;top:-8px;font-family:var(--font-cn);font-size:88px;color:rgba(255,255,255,0.1);font-weight:700;line-height:1;pointer-events:none}
+.hdr-top{padding:0.875rem 1.25rem 0;display:flex;align-items:flex-start;justify-content:space-between;position:relative}
+.hdr-title{font-size:19px;font-weight:600;color:#fff;letter-spacing:-0.3px}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,0.62);margin-top:2px}
+.hdr-user{display:flex;align-items:center;gap:8px;padding:0.55rem 1.25rem;position:relative}
+.hdr-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:15px}
+.hdr-uname{font-size:12px;color:rgba(255,255,255,0.88);font-weight:500}
+.hdr-switch{margin-left:auto;font-size:11px;color:rgba(255,255,255,0.45);cursor:pointer;background:none;border:none;font-family:var(--font)}
+.hdr-cd{background:rgba(0,0,0,0.18);padding:5px 1.25rem;display:flex;justify-content:space-between;align-items:center}
+.hdr-cd-lbl{font-size:11px;color:rgba(255,255,255,0.55)}
+.hdr-cd-n{font-size:14px;font-weight:600;color:#fff}
+
+.nav{display:flex;background:var(--paper);border-bottom:1px solid var(--border);overflow-x:auto;position:sticky;top:0;z-index:50}
+.nav::-webkit-scrollbar{display:none}
+.nb{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:8px 12px 7px;cursor:pointer;border:none;background:none;color:var(--gray);font-size:9px;font-weight:500;gap:2px;font-family:var(--font);border-bottom:2px solid transparent;margin-bottom:-1px;text-transform:uppercase;letter-spacing:0.05em}
+.nb.active{color:var(--red);border-bottom-color:var(--red)}
+.ni{font-size:16px}
+
+.content{padding:1rem 1.25rem 5rem}
+.sec{display:none}.sec.active{display:block}
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.sh-t{font-size:17px;font-weight:600;letter-spacing:-0.3px}
+.sh-line{flex:1;height:1px;background:var(--red);opacity:0.15}
+.sh-hz{font-family:var(--font-cn);font-size:12px;color:var(--red);opacity:0.5}
+
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.75rem;box-shadow:var(--shadow)}
+.card-t{font-size:10px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem}
+.card-tr{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem}
+.card-act{font-size:12px;color:var(--red);cursor:pointer;background:none;border:1px solid var(--red);border-radius:20px;padding:3px 10px;font-family:var(--font);font-weight:500}
+
+.sg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:0.75rem}
+.st{background:var(--grayl);border-radius:var(--radius-sm);padding:0.875rem;text-align:center}
+.sn{font-size:21px;font-weight:600;color:var(--red)}
+.sl{font-size:11px;color:var(--gray);margin-top:2px}
+
+.fr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.fr:last-child{border-bottom:none}
+.fl{font-size:12px;color:var(--gray);width:80px;flex-shrink:0}
+.fi{font-size:13px;flex:1;border:none;background:none;color:var(--ink);font-family:var(--font);padding:0;outline:none}
+
+.badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap}
+.bok{background:var(--greenl);color:var(--green)}
+.bpend{background:var(--redl);color:var(--redd)}
+.bgold{background:var(--goldl);color:var(--goldd)}
+.bblue{background:var(--bluel);color:var(--blue)}
+
+/* STATE TOGGLES */
+.state-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.state-row:last-child{border-bottom:none}
+.state-lbl{font-size:13px;flex:1}
+.tog{width:38px;height:22px;border-radius:11px;border:none;cursor:pointer;position:relative;flex-shrink:0;transition:background 0.2s}
+.tog.on{background:var(--green)}.tog.off{background:var(--grayb)}
+.tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;transition:left 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.tog.on::after{left:19px}.tog.off::after{left:3px}
+
+/* PARTICIPANTS */
+.pr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.pr:last-child{border-bottom:none}
+.pav2{width:34px;height:34px;border-radius:50%;background:var(--redl);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.pname{font-size:13px;font-weight:500;border:none;background:none;color:var(--ink);font-family:var(--font);width:100%;outline:none}
+.ptype-sel{font-size:11px;border:1px solid var(--border);border-radius:6px;padding:2px 6px;background:none;font-family:var(--font);color:var(--ink);cursor:pointer}
+
+/* BUDGET BARS */
+.bbar{margin-bottom:10px}
+.bbar-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.bbar-lbl{color:var(--gray)}
+.bbar-val{font-weight:500}
+.bbar-track{background:var(--grayl);border-radius:3px;height:6px}
+.bbar-fill{height:6px;border-radius:3px}
+
+/* SYNC BADGE */
+.sync-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--greenl);border-radius:var(--radius-sm);margin-bottom:0.75rem;font-size:11px;color:var(--green);font-weight:500}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.sync-time{margin-left:auto;font-weight:400;color:var(--gray)}
+
+/* FLIGHTS */
+.flight-card{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:0.75rem;box-shadow:var(--shadow)}
+.fhdr{background:var(--red);padding:0.65rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.fhdr-l{font-size:13px;font-weight:500;color:#fff}
+.fhdr-r{font-size:11px;color:rgba(255,255,255,0.65)}
+.fbody{padding:1rem}
+.froute{display:flex;align-items:center;gap:8px;margin-bottom:0.875rem}
+.fap{text-align:center;min-width:52px}
+.fcode{font-size:20px;font-weight:600;letter-spacing:-0.5px}
+.fcity{font-size:10px;color:var(--gray);margin-top:1px}
+.ftime{font-size:13px;font-weight:500;margin-top:3px}
+.fmid{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.fdur{font-size:10px;color:var(--gray)}
+.ftrack{width:100%;height:1px;background:var(--border);position:relative}
+.fdot{width:6px;height:6px;border-radius:50%;background:var(--red);position:absolute;top:-3px}
+.fdot.l{left:0}.fdot.r{right:0}
+.fstop{font-size:10px;color:var(--red);font-weight:500}
+.flegs{border-top:1px solid var(--border);padding-top:0.75rem}
+.fleg{display:flex;gap:8px;padding:4px 0}
+.fleg-n{font-size:10px;background:var(--redl);color:var(--redd);padding:2px 7px;border-radius:20px;white-space:nowrap;align-self:flex-start;margin-top:1px;font-weight:500}
+.fleg-i{font-size:12px;color:var(--gray);line-height:1.5}
+.fcnx{font-size:11px;color:var(--gold);background:var(--goldl);padding:3px 10px;border-radius:20px;display:inline-block;margin:2px 0;font-weight:500}
+
+/* ITINERARY */
+.day-card{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.6rem;overflow:hidden;box-shadow:var(--shadow)}
+.dhdr{padding:0.7rem 1rem;display:flex;align-items:center;gap:10px;cursor:pointer;background:#fff}
+.dhdr:active{background:var(--grayl)}
+.dnum{width:30px;height:30px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.dnum.travel{background:var(--gold)}
+.dcity{font-size:13px;font-weight:500;flex:1}
+.dhz{font-family:var(--font-cn);font-size:10px;color:var(--red);opacity:0.55;margin-left:4px}
+.ddate{font-size:11px;color:var(--gray)}
+.darr{font-size:14px;color:var(--gray);transition:transform 0.2s}
+.darr.open{transform:rotate(90deg)}
+.dbody{padding:0.875rem 1rem;border-top:1px solid var(--border);background:var(--grayl);display:none}
+.dbody.open{display:block}
+.arow{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.arow:last-child{border-bottom:none}
+.acb{margin-top:3px;width:16px;height:16px;flex-shrink:0;accent-color:var(--red);cursor:pointer}
+.atext{font-size:13px;flex:1;line-height:1.5}
+.alink{font-size:11px;color:var(--red);text-decoration:none;display:block;margin-top:3px;font-weight:500}
+.acnbtn{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--redd);background:var(--redl);border:none;border-radius:20px;padding:3px 8px;cursor:pointer;font-family:var(--font);font-weight:500;margin-top:3px}
+.ainfo{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)}
+.ainfo:last-child{border-bottom:none}
+.adot{width:4px;height:4px;border-radius:50%;background:var(--gray);margin-top:7px;flex-shrink:0}
+.ainfo-t{font-size:12px;color:var(--gray);flex:1;line-height:1.5}
+.mapbtn{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--red);background:var(--redl);border:none;border-radius:20px;padding:5px 12px;cursor:pointer;font-family:var(--font);font-weight:500;margin-bottom:8px}
+.tr-strip{display:flex;align-items:center;gap:6px;padding:5px 0;margin-bottom:6px;flex-wrap:wrap}
+.tr-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--goldl);color:var(--goldd);font-weight:500}
+
+/* FAB + ADD PANEL */
+.fab{position:fixed;bottom:76px;right:max(16px,calc(50vw - 220px + 16px));width:48px;height:48px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(192,57,43,0.4);display:none;align-items:center;justify-content:center;z-index:100;font-family:var(--font);line-height:1}
+.fab:active{transform:scale(0.91)}
+.add-panel{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;background:#fff;border-radius:20px 20px 0 0;padding:1.25rem;box-shadow:0 -8px 32px rgba(0,0,0,0.1);z-index:200;display:none}
+.add-panel.open{display:block}
+.ap-title{font-size:15px;font-weight:600;margin-bottom:1rem}
+.ap-row{display:flex;flex-direction:column;gap:5px;margin-bottom:0.75rem}
+.ap-lbl{font-size:10px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:0.06em}
+.ap-inp{font-size:13px;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font);background:var(--grayl);color:var(--ink);outline:none;width:100%}
+.ap-inp:focus{border-color:var(--red);background:#fff}
+.ap-sel{font-size:13px;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--font);background:var(--grayl);color:var(--ink);outline:none;width:100%;cursor:pointer}
+.ap-btns{display:flex;gap:8px;margin-top:0.5rem}
+.ap-btn{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer}
+.ap-btn.p{background:var(--red);color:#fff;border:none}
+.ap-btn.s{background:none;color:var(--gray);border:1px solid var(--border)}
+
+/* HOTELS */
+.hcard{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.75rem;overflow:hidden;box-shadow:var(--shadow)}
+.hchdr{padding:0.6rem 1rem;font-size:10px;font-weight:600;color:var(--red);background:var(--redl);border-bottom:1px solid var(--redb);display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:0.07em}
+.hopt{padding:0.875rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;background:#fff}
+.hopt:last-child{border-bottom:none}
+.hrad{width:17px;height:17px;margin-top:2px;flex-shrink:0;accent-color:var(--red)}
+.hinfo{flex:1}
+.hname{font-size:13px;font-weight:500}
+.hdet{font-size:11px;color:var(--gray);margin-top:2px}
+.hbkl{font-size:11px;color:var(--red);text-decoration:none;display:block;margin-top:4px;font-weight:500}
+.hpr{text-align:right;flex-shrink:0}
+.hprice{font-size:15px;font-weight:600;color:var(--red)}
+.hpsub{font-size:10px;color:var(--gray)}
+.vrow{display:flex;gap:6px;margin-top:7px;align-items:center}
+.vbtn{padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:none;cursor:pointer;font-size:11px;font-family:var(--font);color:var(--gray);font-weight:500}
+.vbtn.voted{background:var(--redl);border-color:var(--red);color:var(--redd)}
+.vicons{font-size:14px;color:var(--gray)}
+.hadd-form{padding:0.875rem 1rem;background:var(--grayl);border-top:1px solid var(--border);display:none}
+.hadd-form.open{display:block}
+.hadd-inp{width:100%;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:var(--font);background:#fff;color:var(--ink);outline:none;margin-bottom:6px}
+.hadd-row{display:flex;gap:6px}
+.hadd-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer}
+.hadd-btn.p{background:var(--red);color:#fff;border:none}
+.hadd-btn.s{background:none;color:var(--gray);border:1px solid var(--border)}
+
+/* MAP */
+.mstop{display:flex;gap:12px;align-items:stretch}
+.mcol{display:flex;flex-direction:column;align-items:center;width:18px;flex-shrink:0}
+.mdot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:4px;border:2px solid var(--red)}
+.mdot.f{background:var(--red)}
+.mline{flex:1;width:2px;background:var(--red);opacity:0.15;min-height:24px}
+.minfo{flex:1;padding-bottom:1.25rem}
+.mcity{font-size:15px;font-weight:600;letter-spacing:-0.2px}
+.msub{font-size:11px;color:var(--gray);margin-top:2px}
+.mtb{background:var(--red);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-top:10px}
+.mtbl{font-size:10px;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;font-weight:600}
+.mtbm{font-size:13px;font-weight:500;color:#fff;line-height:1.6}
+.mtbd{font-size:11px;color:rgba(255,255,255,0.7);margin-top:3px}
+.mtblinks{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.mtbl-a{font-size:11px;padding:4px 11px;border-radius:20px;text-decoration:none;font-weight:500}
+.mtbl-book{background:rgba(255,255,255,0.9);color:var(--redd)}
+.mtbl-didi{background:#FF6600;color:#fff}
+.mtbl-amap{background:#1565C0;color:#fff}
+.mtrf{font-size:11px;color:rgba(255,255,255,0.65);margin-top:6px}
+
+/* COSTS */
+.cost-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.cost-row:last-child{border-bottom:none}
+.cost-cb{width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--red);cursor:pointer}
+.cost-body{flex:1;min-width:0}
+.cost-name{font-size:13px;font-weight:500;border:none;background:none;color:var(--ink);font-family:var(--font);width:100%;outline:none;padding:0}
+.cost-meta{display:flex;gap:5px;align-items:center;margin-top:5px;flex-wrap:wrap}
+.cost-inp{font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-family:var(--font);background:var(--grayl);color:var(--ink);outline:none;width:58px;text-align:center}
+.cost-inp:focus{border-color:var(--red);background:#fff}
+.cost-lbl{font-size:11px;color:var(--gray)}
+.cost-right{text-align:right;flex-shrink:0}
+.cost-total{font-size:15px;font-weight:600}
+.cost-status{font-size:10px;padding:3px 9px;border-radius:20px;display:inline-block;margin-top:4px;font-weight:500;cursor:pointer;user-select:none}
+.cs-paid{background:var(--greenl);color:var(--green)}
+.cs-budget{background:var(--redl);color:var(--redd)}
+.cs-real{background:var(--bluel);color:var(--blue)}
+.legend{display:flex;gap:10px;margin-bottom:0.75rem;flex-wrap:wrap}
+.leg-i{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray)}
+.leg-d{width:9px;height:9px;border-radius:50%}
+
+/* CONVERTER */
+.rate-box{background:var(--red);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:0.75rem;display:flex;align-items:center;justify-content:space-between}
+.rate-lbl{font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:2px}
+.rate-sub{font-size:10px;color:rgba(255,255,255,0.45)}
+.rate-inp{font-size:26px;font-weight:600;color:#fff;border:none;background:none;width:100px;text-align:right;font-family:var(--font);outline:none}
+.conv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:0.75rem}
+.conv-field{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.875rem;box-shadow:var(--shadow)}
+.conv-lbl{font-size:10px;color:var(--gray);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.conv-inp{font-size:22px;font-weight:600;border:none;background:none;width:100%;color:var(--ink);font-family:var(--font);outline:none}
+.prow{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.prow:last-child{border-bottom:none}
+.pitem{font-size:13px;flex:1}
+.pcny{font-size:12px;font-weight:500;color:var(--gray);width:52px;text-align:right}
+.peur{font-size:13px;font-weight:600;color:var(--red);width:52px;text-align:right}
+
+/* CFG */
+.cfg-tog{display:flex;align-items:center;justify-content:space-between;padding:0.875rem 1.25rem;background:var(--grayl);border-top:1px solid var(--border);cursor:pointer;margin:0 -1.25rem}
+.cfg-tog-t{font-size:13px;font-weight:500}
+.cfg-body{display:none;margin:0 -1.25rem;padding:0 1.25rem 1rem;background:var(--grayl)}
+.cfg-body.open{display:block}
+.tips-i{padding:8px 0;border-bottom:1px solid var(--border)}
+.tips-i:last-child{border-bottom:none}
+.tips-t{font-size:12px;font-weight:600;color:var(--red);margin-bottom:2px}
+.tips-d{font-size:12px;color:var(--gray);line-height:1.5}
+
+/* CN OVERLAY */
+.cn-overlay{display:none;position:absolute;top:0;left:0;right:0;z-index:500;background:var(--red);flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;min-height:100vh}
+.cn-overlay.open{display:flex}
+.cn-big{font-family:var(--font-cn);font-size:88px;color:#fff;line-height:1;margin-bottom:0.5rem;font-weight:700}
+.cn-pinyin{font-size:20px;color:rgba(255,255,255,0.65);margin-bottom:4px}
+.cn-pt{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:1.5rem}
+.cn-addr{font-size:14px;color:rgba(255,255,255,0.82);line-height:1.8;padding:1rem 1.25rem;background:rgba(255,255,255,0.1);border-radius:12px;width:100%;max-width:320px;margin-bottom:2rem;font-family:var(--font-cn)}
+.cn-close{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:12px 2.5rem;font-size:14px;font-family:var(--font);cursor:pointer;font-weight:500}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;background:#fff;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,0.05)}
+.bnb{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 10px;cursor:pointer;border:none;background:none;color:var(--gray);font-size:9px;font-weight:500;gap:2px;font-family:var(--font);border-top:2px solid transparent;margin-top:-1px;text-transform:uppercase;letter-spacing:0.04em}
+.bnb.active{color:var(--red);border-top-color:var(--red)}
+.bni{font-size:17px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ LOADING ═══════════════════════════════ -->
+<div id="scr-loading" class="screen active">
+  <div class="load-hz">中</div>
+  <div class="load-spinner"></div>
+  <div class="load-txt">A carregar dados da viagem...</div>
+</div>
+
+<!-- ═══════════════════════════════ ERROR ═══════════════════════════════ -->
+<div id="scr-error" class="screen">
+  <div class="err-icon">⚠</div>
+  <div class="err-title">Não foi possível carregar</div>
+  <div class="err-msg">Verifica se o Google Sheet está publicado corretamente e o ID está configurado no topo do ficheiro.</div>
+  <div class="err-code" id="err-detail"></div>
+  <button class="err-btn" onclick="location.reload()">Tentar novamente</button>
+</div>
+
+<!-- ═══════════════════════════════ WELCOME ═══════════════════════════════ -->
+<div id="scr-welcome" class="screen">
+  <div class="w-bg-hz">中国</div>
+  <div class="w-logo">
+    <div class="w-title" id="w-title">China 2026</div>
+    <div class="w-sub" id="w-sub">A carregar...</div>
+  </div>
+  <div class="w-card">
+    <div class="w-q">Quem és tu nesta viagem?</div>
+    <div class="pax-list" id="pax-list"></div>
+    <button class="w-enter" id="w-enter" disabled onclick="enterApp()">Seleciona o teu perfil</button>
+    <div class="w-loading-msg" id="w-msg"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MAIN APP ═══════════════════════════════ -->
+<div id="scr-main" class="screen">
+
+  <!-- CN OVERLAY -->
+  <div class="cn-overlay" id="cn-overlay">
+    <div class="cn-big" id="cn-big"></div>
+    <div class="cn-pinyin" id="cn-pinyin"></div>
+    <div class="cn-pt" id="cn-pt"></div>
+    <div class="cn-addr" id="cn-addr"></div>
+    <button class="cn-close" onclick="closeCN()">Fechar</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="hdr-bg">中国</div>
+    <div class="hdr-top">
+      <div>
+        <div class="hdr-title" id="hdr-title">China 2026</div>
+        <div class="hdr-sub" id="hdr-sub">A carregar...</div>
+      </div>
+    </div>
+    <div class="hdr-user">
+      <div class="hdr-av" id="hdr-icon"></div>
+      <span class="hdr-uname" id="hdr-name"></span>
+      <button class="hdr-switch" onclick="switchUser()">trocar utilizador</button>
+    </div>
+    <div class="hdr-cd">
+      <span class="hdr-cd-lbl">Dias até à partida</span>
+      <span class="hdr-cd-n" id="cdown">—</span>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nb active" onclick="showSec('geral',this)"><span class="ni">⊞</span>Geral</button>
+    <button class="nb" onclick="showSec('itin',this)"><span class="ni">◷</span>Itinerário</button>
+    <button class="nb" onclick="showSec('hotels',this)"><span class="ni">⌂</span>Hotéis</button>
+    <button class="nb" onclick="showSec('mapa',this)"><span class="ni">↗</span>Mapa</button>
+    <button class="nb" onclick="showSec('custos',this)"><span class="ni">¥</span>Custos</button>
+    <button class="nb" onclick="showSec('conv',this)"><span class="ni">⇄</span>Câmbio</button>
+  </div>
+
+  <!-- ADD ACTIVITY PANEL -->
+  <div class="add-panel" id="add-panel">
+    <div class="ap-title">Adicionar atividade</div>
+    <div class="ap-row"><label class="ap-lbl">Dia</label><select class="ap-sel" id="ap-day"></select></div>
+    <div class="ap-row"><label class="ap-lbl">Descrição</label><input class="ap-inp" id="ap-desc" placeholder="Ex: Visita ao museu..."></div>
+    <div class="ap-row"><label class="ap-lbl">Tipo</label>
+      <select class="ap-sel" id="ap-tipo">
+        <option value="ativ">Visita (com checkbox)</option>
+        <option value="info">Informação / logística</option>
+      </select>
+    </div>
+    <div class="ap-row"><label class="ap-lbl">Link (opcional)</label><input class="ap-inp" id="ap-link" placeholder="https://..."></div>
+    <div class="ap-btns">
+      <button class="ap-btn p" onclick="saveActivity()">Adicionar</button>
+      <button class="ap-btn s" onclick="closeAddPanel()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- GERAL -->
+    <div class="sec active" id="sec-geral">
+      <div class="sh"><span class="sh-t">Visão geral</span><span class="sh-line"></span><span class="sh-hz">总览</span></div>
+      <div id="sync-bar-geral"></div>
+      <div class="sg">
+        <div class="st"><div class="sn" id="vg-dias">15</div><div class="sl">dias de viagem</div></div>
+        <div class="st"><div class="sn" id="vg-pax">—</div><div class="sl">participantes</div></div>
+        <div class="st"><div class="sn" id="vg-cidades">—</div><div class="sl">cidades</div></div>
+        <div class="st"><div class="sn" id="vg-pago">—</div><div class="sl">total pago</div></div>
+      </div>
+      <div class="card">
+        <div class="card-t">Estado geral</div>
+        <div id="state-rows"></div>
+      </div>
+      <div class="card">
+        <div class="card-t">Orçamento estimado</div>
+        <div id="budget-bars"></div>
+      </div>
+      <div class="cfg-tog" onclick="toggleCfg()">
+        <span class="cfg-tog-t">⚙ Configuração da viagem</span>
+        <span id="cfg-arr" style="font-size:12px;color:var(--gray)">›</span>
+      </div>
+      <div class="cfg-body" id="cfg-body">
+        <div style="height:0.75rem"></div>
+        <div class="card" style="margin-bottom:0.5rem">
+          <div class="card-t">Detalhes</div>
+          <div class="fr"><span class="fl">Destino</span><input class="fi" id="cfg-dest" value="China"></div>
+          <div class="fr"><span class="fl">Início</span><input class="fi" type="date" id="cfg-start" onchange="updateCountdown()"></div>
+          <div class="fr"><span class="fl">Fim</span><input class="fi" type="date" id="cfg-end"></div>
+          <div class="fr"><span class="fl">Percurso</span><input class="fi" id="cfg-perc" value="Percurso B"></div>
+        </div>
+        <div class="card" style="margin-bottom:0.5rem">
+          <div class="card-tr"><span class="card-t" style="margin:0">Participantes</span><button class="card-act" onclick="addP()">+ Adicionar</button></div>
+          <div id="p-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-t">Avisos práticos</div>
+          <div class="tips-i"><div class="tips-t">WeChat Pay</div><div class="tips-d">Indispensável na China. Ligar cartão estrangeiro antes de partir.</div></div>
+          <div class="tips-i"><div class="tips-t">VPN</div><div class="tips-d">Google, WhatsApp e Instagram bloqueados. Instalar antes de entrar no país.</div></div>
+          <div class="tips-i"><div class="tips-t">SIM card</div><div class="tips-d">China Unicom recomendado. Comprar à chegada em PEK.</div></div>
+          <div class="tips-i"><div class="tips-t">Didi 滴滴</div><div class="tips-d">Configurar antes de partir. Aceita cartão estrangeiro via WeChat Pay.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ITINERÁRIO -->
+    <div class="sec" id="sec-itin">
+      <div class="sh"><span class="sh-t">Itinerário</span><span class="sh-line"></span><span class="sh-hz">行程</span></div>
+      <div id="itin-list"></div>
+    </div>
+
+    <!-- HOTÉIS -->
+    <div class="sec" id="sec-hotels">
+      <div class="sh"><span class="sh-t">Alojamento</span><span class="sh-line"></span><span class="sh-hz">住宿</span></div>
+      <div id="hotels-list"></div>
+    </div>
+
+    <!-- MAPA -->
+    <div class="sec" id="sec-mapa">
+      <div class="sh"><span class="sh-t">Percurso & deslocações</span><span class="sh-line"></span><span class="sh-hz">路线</span></div>
+      <div class="card"><div id="map-route"></div></div>
+      <div class="card">
+        <div class="card-t">Navegação local</div>
+        <div class="fr" style="flex-direction:column;align-items:flex-start;gap:3px;padding:10px 0">
+          <span style="font-size:13px;font-weight:500;color:var(--red)">Didi 滴滴</span>
+          <span style="font-size:12px;color:var(--gray)">Equivalente ao Uber. App em inglês. Aceita WeChat Pay.</span>
+          <a href="https://www.didiglobal.com" target="_blank" style="font-size:12px;color:var(--red);font-weight:500">Abrir Didi →</a>
+        </div>
+        <div class="fr" style="flex-direction:column;align-items:flex-start;gap:3px;padding:10px 0">
+          <span style="font-size:13px;font-weight:500;color:var(--red)">Amap 高德地图</span>
+          <span style="font-size:12px;color:var(--gray)">Melhor app de mapas para estrangeiros. Funciona sem VPN.</span>
+          <a href="https://uri.amap.com" target="_blank" style="font-size:12px;color:var(--red);font-weight:500">Abrir Amap →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOS -->
+    <div class="sec" id="sec-custos">
+      <div class="sh"><span class="sh-t">Custos</span><span class="sh-line"></span><span class="sh-hz">费用</span></div>
+      <div class="sg">
+        <div class="st"><div class="sn" id="c-pago">—</div><div class="sl">pago</div></div>
+        <div class="st"><div class="sn" id="c-pend">—</div><div class="sl">pendente</div></div>
+      </div>
+      <div class="legend">
+        <div class="leg-i"><div class="leg-d" style="background:var(--greenl);border:1.5px solid var(--green)"></div>pago</div>
+        <div class="leg-i"><div class="leg-d" style="background:var(--redl);border:1.5px solid var(--redd)"></div>orçamentado</div>
+        <div class="leg-i"><div class="leg-d" style="background:var(--bluel);border:1.5px solid var(--blue)"></div>valor real</div>
+      </div>
+      <div class="card">
+        <div class="card-tr"><span class="card-t" style="margin:0">Tracker de pagamentos</span><button class="card-act" onclick="addCost()">+ Adicionar</button></div>
+        <div id="costs-list"></div>
+      </div>
+    </div>
+
+    <!-- CÂMBIO -->
+    <div class="sec" id="sec-conv">
+      <div class="sh"><span class="sh-t">Câmbio & preços</span><span class="sh-line"></span><span class="sh-hz">汇率</span></div>
+      <div class="rate-box">
+        <div>
+          <div class="rate-lbl">1 EUR =</div>
+          <div class="rate-sub">Atualizar via <a href="https://finance.google.com/quote/EURCNY:CURRENCY" target="_blank" style="color:rgba(255,255,255,0.65)">Google Finance</a></div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:3px">
+          <input class="rate-inp" id="rate-val" type="number" value="7.85" step="0.01" oninput="updateConv()">
+          <span style="font-size:15px;color:rgba(255,255,255,0.65)">CNY</span>
+        </div>
+      </div>
+      <div class="conv-grid">
+        <div class="conv-field"><div class="conv-lbl">EUR €</div><input class="conv-inp" id="conv-eur" type="number" value="1" oninput="fromEur()"></div>
+        <div class="conv-field"><div class="conv-lbl">CNY 人民币</div><input class="conv-inp" id="conv-cny" type="number" value="7.85" oninput="fromCny()"></div>
+      </div>
+      <div id="sync-bar-conv"></div>
+      <div class="card">
+        <div class="card-t">Preços de referência</div>
+        <div id="price-ref"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" id="fab">+</button>
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="bnb active" onclick="showSec('geral',this)"><span class="bni">⊞</span>Geral</button>
+    <button class="bnb" onclick="showSec('itin',this)"><span class="bni">◷</span>Itinerário</button>
+    <button class="bnb" onclick="showSec('hotels',this)"><span class="bni">⌂</span>Hotéis</button>
+    <button class="bnb" onclick="showSec('mapa',this)"><span class="bni">↗</span>Mapa</button>
+    <button class="bnb" onclick="showSec('custos',this)"><span class="bni">¥</span>Custos</button>
+    <button class="bnb" onclick="showSec('conv',this)"><span class="bni">⇄</span>Câmbio</button>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// CONFIGURAÇÃO — ALTERAR APENAS AQUI
+// ═══════════════════════════════════════════════════════════════════
+const SHEET_ID = '1iUrI4Y8Fip7L_AiclzKSBe6F7roFFntwl2frZ7J7l50';
+// Para obter o ID: abrir o Google Sheet → copiar o ID do URL
+// https://docs.google.com/spreadsheets/d/ESTE_É_O_ID/edit
+// Após publicar o Sheet (Ficheiro → Partilhar → Publicar na web)
+// ═══════════════════════════════════════════════════════════════════
+
+const SHEET_NAMES = {
+  config:      'Config',
+  participantes:'Participantes',
+  itinerario:  'Itinerario',
+  hoteis:      'Hoteis',
+  mapa:        'Mapa',
+  custos:      'Custos',
+  cambio:      'Cambio',
+  precos:      'Precos'
+};
+
+let sheetData = {};
+let currentUser = null;
+let participants = [];
+let days = [];
+let hotels = [];
+let costs = [];
+let mapStops = [];
+let priceRef = [];
+let stateItems = [];
+let syncTime = null;
+let extraVotes = {}; // votes added locally
+
+// ═══ GOOGLE SHEETS FETCH ═══
+function sheetUrl(sheetName) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+}
+
+function parseCSV(text) {
+  // Split into tokens respecting quoted fields
+  function tokenize(line) {
+    const vals = [];
+    let cur = '', inQ = false, i = 0;
+    while (i < line.length) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQ && line[i+1] === '"') { cur += '"'; i += 2; continue; }
+        inQ = !inQ; i++; continue;
+      }
+      if (ch === ',' && !inQ) { vals.push(cur); cur = ''; i++; continue; }
+      cur += ch; i++;
+    }
+    vals.push(cur);
+    return vals.map(v => v.trim());
+  }
+
+  // Split lines respecting quoted newlines
+  const rows = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') { inQ = !inQ; cur += ch; }
+    else if ((ch === '\n' || ch === '\r') && !inQ) {
+      if (cur.trim()) rows.push(cur);
+      cur = '';
+      if (ch === '\r' && text[i+1] === '\n') i++;
+    } else { cur += ch; }
+  }
+  if (cur.trim()) rows.push(cur);
+
+  if (rows.length < 2) return [];
+  // Skip decorative title rows — find the real header row (has multiple non-empty cols)
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(rows.length, 5); i++) {
+    const cols = tokenize(rows[i]);
+    const nonEmpty = cols.filter(c => c.length > 0);
+    if (nonEmpty.length >= 2 && !cols[0].includes(' ') && cols[0] === cols[0].toLowerCase()) {
+      headerIdx = i; break;
+    }
+    if (nonEmpty.length >= 2 && cols[1] !== '') { headerIdx = i; }
+  }
+  const headers = tokenize(rows[headerIdx]);
+  return rows.slice(headerIdx + 1).map(line => {
+    const vals = tokenize(line);
+    const obj = {};
+    headers.forEach((h, i) => { if(h) obj[h] = vals[i] !== undefined ? vals[i] : ''; });
+    return obj;
+  }).filter(obj => Object.values(obj).some(v => v !== ''));
+}
+
+async function fetchSheet(name) {
+  const res = await fetch(sheetUrl(name));
+  if (!res.ok) throw new Error(`HTTP ${res.status} ao carregar aba "${name}"`);
+  const text = await res.text();
+  return parseCSV(text);
+}
+
+async function fetchAllSheets() {
+  const results = {};
+  for (const [key, name] of Object.entries(SHEET_NAMES)) {
+    try { results[key] = await fetchSheet(name); console.log(`✅ "${name}": ${results[key].length} rows`, results[key][0]); }
+    catch(e) { results[key] = []; console.error(`❌ "${name}" FALHOU:`, e.message, e.stack); }
+  }
+  return results;
+}
+
+// ═══ DATA PARSING ═══
+function parseData(data) {
+  // Config
+  const cfg = {};
+  (data.config || []).forEach(r => { if(r.chave) cfg[r.chave] = r.valor; });
+
+  // Participantes
+  participants = (data.participantes || []).filter(r => r.nome).map(r => ({
+    nome: r.nome,
+    tipo: (r.tipo||'adulto').toLowerCase(),
+    icon: r.icon || '🌏',
+    pago: r.pago === true || r.pago === 'TRUE' || r.pago === 'true' || r.pago === 1
+  }));
+
+  // Itinerário
+  days = [];
+  let currentDay = null;
+  (data.itinerario || []).forEach(r => {
+    if (r.dia && r.local) {
+      currentDay = {
+        dia: parseInt(r.dia),
+        data: r.data || '',
+        local: r.local,
+        hanzi: r.hanzi || '',
+        isTravel: r.viagem === true || r.viagem === 'TRUE' || r.viagem === 'true',
+        atividades: [],
+        transfer: r.transfer ? { de: r.transfer_de||'', para: r.transfer_para||'', didi: r.didi === 'TRUE' || r.didi === true } : null
+      };
+      days.push(currentDay);
+    }
+    if (currentDay && r.atividade) {
+      currentDay.atividades.push({
+        txt: r.atividade,
+        tipo: r.tipo_ativ || 'info',
+        link: r.link || '',
+        cn: r.cn_hanzi ? { big: r.cn_hanzi, pinyin: r.cn_pinyin||'', pt: r.cn_pt||'', addr: r.cn_addr||'' } : null
+      });
+    }
+  });
+
+  // Hotéis
+  hotels = [];
+  let currentHotel = null;
+  (data.hoteis || []).forEach(r => {
+    if (r.cidade) {
+      currentHotel = { cidade: r.cidade, noites: r.noites||'', opcoes: [] };
+      hotels.push(currentHotel);
+    }
+    if (currentHotel && r.nome_hotel) {
+      currentHotel.opcoes.push({
+        nome: r.nome_hotel,
+        det: r.detalhe||'',
+        preco: r.preco||'—',
+        link: r.link||'',
+        votos: r.votos ? r.votos.split(',').map(v=>v.trim()).filter(Boolean) : []
+      });
+    }
+  });
+
+  // Mapa
+  mapStops = (data.mapa || []).filter(r => r.cidade).map(r => ({
+    cidade: r.cidade,
+    sub: r.sub||'',
+    filled: r.filled !== false && r.filled !== 'FALSE',
+    travel: r.tipo_transp ? {
+      tipo: r.tipo_transp,
+      nome: r.nome_transp||'',
+      p1: r.partida||'',
+      p2: r.chegada||'',
+      dur: r.duracao||'',
+      custo: r.custo||'',
+      link: r.link_reserva||'',
+      transfer: r.transfer_info||''
+    } : null
+  }));
+
+  // Custos
+  costs = (data.custos || []).filter(r => r.nome).map(r => ({
+    nome: r.nome,
+    pp_adult: parseFloat(r.pp_adulto)||0,
+    pp_child: parseFloat(r.pp_crianca)||0,
+    pago: r.pago === true || r.pago === 'TRUE',
+    real: r.real === true || r.real === 'TRUE'
+  }));
+
+  // Câmbio
+  const cambioRow = (data.cambio || []).find(r => r.taxa);
+  const taxa = cambioRow ? parseFloat(cambioRow.taxa) : 7.85;
+  if (!isNaN(taxa) && taxa > 0) {
+    document.getElementById('rate-val').value = taxa.toFixed(2);
+  }
+
+  // Preços de referência
+  priceRef = (data.precos || []).filter(r => r.item).map(r => ({
+    item: r.item,
+    cny: parseFloat(r.preco_cny)||0
+  }));
+
+  // State items — from config
+  stateItems = [
+    { label: 'Voos reservados', key: 'voos_ok', on: cfg.voos_ok === 'TRUE' },
+    { label: 'WeChat Pay configurado', key: 'wechat_ok', on: cfg.wechat_ok === 'TRUE' },
+    { label: 'VPN instalada', key: 'vpn_ok', on: cfg.vpn_ok === 'TRUE' },
+    { label: 'SIM card / eSIM', key: 'sim_ok', on: cfg.sim_ok === 'TRUE' },
+    { label: 'Seguro de viagem', key: 'seguro_ok', on: cfg.seguro_ok === 'TRUE' },
+    { label: 'Comboios reservados', key: 'comboios_ok', on: cfg.comboios_ok === 'TRUE' }
+  ];
+
+  // Update config fields
+  if (cfg.destino) document.getElementById('cfg-dest').value = cfg.destino;
+  if (cfg.data_inicio) document.getElementById('cfg-start').value = cfg.data_inicio;
+  if (cfg.data_fim) document.getElementById('cfg-end').value = cfg.data_fim;
+  if (cfg.percurso) document.getElementById('cfg-perc').value = cfg.percurso;
+
+  // Header
+  const tripName = cfg.nome_viagem || 'China 2026';
+  const paxCount = participants.length;
+  const startDate = cfg.data_inicio || '';
+  const endDate = cfg.data_fim || '';
+  document.getElementById('hdr-title').textContent = tripName;
+  document.getElementById('w-title').textContent = tripName;
+  document.getElementById('hdr-sub').textContent = `${cfg.percurso||'Percurso B'} · ${startDate} – ${endDate} · ${paxCount} pessoas`;
+  document.getElementById('w-sub').textContent = `${startDate} → ${endDate} · ${paxCount} participantes`;
+
+  if (cfg.data_inicio) {
+    document.getElementById('cfg-start').value = cfg.data_inicio;
+    updateCountdown(cfg.data_inicio);
+  }
+
+  // Stats
+  const cities = new Set(days.filter(d=>!d.isTravel).map(d=>d.local.split('→')[0].trim())).size;
+  document.getElementById('vg-cidades').textContent = cities || '—';
+  document.getElementById('vg-pax').textContent = paxCount;
+  document.getElementById('vg-dias').textContent = days.length || 15;
+}
+
+// ═══ APP INIT ═══
+async function init() {
+  showScreen('loading');
+
+  if (!SHEET_ID || SHEET_ID === 'SEU_GOOGLE_SHEET_ID_AQUI') {
+    // Fallback — usar dados de exemplo embutidos
+    loadFallbackData();
+    return;
+  }
+
+  try {
+    const data = await fetchAllSheets();
+    try { parseData(data); console.log("✅ parseData OK — participants:", participants.length, "days:", days.length); } catch(pe) { throw new Error("parseData falhou: " + pe.message + " | " + pe.stack); }
+    syncTime = new Date().toLocaleTimeString('pt-PT', {hour:'2-digit',minute:'2-digit'});
+    renderWelcome();
+    showScreen('welcome');
+  } catch(e) {
+    document.getElementById("err-detail").textContent = e.message + " | Stack: " + e.stack;
+    showScreen('error');
+  }
+}
+
+function loadFallbackData() {
+  // Dados de demonstração — substituídos pelo Google Sheet em produção
+  participants = [
+    {nome:"João M.", tipo:"adulto", icon:"🧭", pago:true},
+    {nome:"Ana M.",  tipo:"adulto", icon:"📸", pago:false},
+    {nome:"Teen 1",  tipo:"criança",icon:"🐼", pago:true},
+    {nome:"Teen 2",  tipo:"criança",icon:"🌏", pago:false}
+  ];
+  days = [
+    {dia:1,data:"29 ago, Sáb",local:"Chegada Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Chegada PEK — imigração, transfer, check-in",tipo:"info"},{txt:"Jantar leve e descanso",tipo:"info"}],transfer:{de:"PEK Airport",para:"Hotel central",didi:true}},
+    {dia:2,data:"30 ago, Dom",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Cidade Proibida + Praça Tiananmen",tipo:"ativ",link:"https://www.dpm.org.cn",cn:{big:"故宫",pinyin:"Gùgōng",pt:"Cidade Proibida",addr:"4 Jingshan Front St\n东城区景山前街4号"}},{txt:"Hutongs de rickshaw + street food",tipo:"ativ"},{txt:"Metro / táxi",tipo:"info"}]},
+    {dia:3,data:"31 ago, Seg",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Templo do Céu",tipo:"ativ",link:"https://www.tiantan.org.cn",cn:{big:"天坛",pinyin:"Tiāntán",pt:"Templo do Céu",addr:"1 Tiantan East Rd\n东城区天坛东路1号"}},{txt:"Wangfujing — street food + shopping",tipo:"ativ"},{txt:"Metro",tipo:"info"}]},
+    {dia:4,data:"1 set, Ter",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Universal Studios Beijing — full day",tipo:"ativ",link:"https://www.universalbeijingresort.com",cn:{big:"环球影城",pinyin:"Huánqiú Yǐngchéng",pt:"Universal Studios",addr:"东坝镇东坝村，朝阳区"}},{txt:"Metro direto (~35 min)",tipo:"info"}]},
+    {dia:5,data:"2 set, Qua",local:"Pequim → Xi'an",hanzi:"北京→西安",isTravel:true,atividades:[{txt:"Grande Muralha — Mutianyu + teleférico + tobogã",tipo:"ativ",link:"https://www.mutianyugreatwall.com",cn:{big:"长城",pinyin:"Chángchéng",pt:"Grande Muralha",addr:"Huairou District\n北京市怀柔区慕田峪"}},{txt:"Transfer estação → hotel",tipo:"info"}]},
+    {dia:6,data:"3 set, Qui",local:"Xi'an",hanzi:"西安",isTravel:false,atividades:[{txt:"Exército de Terracota",tipo:"ativ",link:"https://www.bmy.com.cn",cn:{big:"兵马俑",pinyin:"Bīngmǎyǒng",pt:"Exército de Terracota",addr:"Lintong District\n西安市临潼区"}},{txt:"Muralha antiga de bicicleta",tipo:"ativ"},{txt:"Bairro Muçulmano",tipo:"ativ",cn:{big:"回民街",pinyin:"Huímín Jiē",pt:"Bairro Muçulmano",addr:"Lianhu District\n西安市莲湖区"}},{txt:"Táxi / tour",tipo:"info"}]},
+    {dia:7,data:"4 set, Sex",local:"Xi'an → Chengdu",hanzi:"西安→成都",isTravel:true,atividades:[{txt:"Jinli Ancient Street",tipo:"ativ",cn:{big:"锦里",pinyin:"Jǐn Lǐ",pt:"Jinli Ancient Street",addr:"Wuhou District\n成都市武侯区"}},{txt:"Transfer estação → hotel",tipo:"info"}]},
+    {dia:8,data:"5 set, Sáb",local:"Chengdu",hanzi:"成都",isTravel:false,atividades:[{txt:"Panda Base — chegar antes das 8h",tipo:"ativ",link:"https://www.panda.org.cn",cn:{big:"大熊猫",pinyin:"Dà Xióngmāo",pt:"Panda Base",addr:"1375 Panda Ave\n成都市成华区熊猫大道1375号"}},{txt:"Tarde: hotpot típico",tipo:"ativ"},{txt:"Táxi / Didi",tipo:"info"}]},
+    {dia:9,data:"6 set, Dom",local:"Chengdu → Zhangjiajie",hanzi:"成都→张家界",isTravel:true,atividades:[{txt:"Trilha leve no parque Wulingyuan",tipo:"ativ"},{txt:"Transfer estação → hotel",tipo:"info"}]},
+    {dia:10,data:"7 set, Seg",local:"Zhangjiajie",hanzi:"张家界",isTravel:false,atividades:[{txt:"Bailong Elevator (326m)",tipo:"ativ",cn:{big:"百龙天梯",pinyin:"Bǎilóng Tiāntī",pt:"Elevador Bailong",addr:"Wulingyuan District\n张家界市武陵源区"}},{txt:"Ponte de vidro + teleférico",tipo:"ativ"},{txt:"Autocarro interno do parque",tipo:"info"}]},
+    {dia:11,data:"8 set, Ter",local:"Zhangjiajie → Xangai",hanzi:"张家界→上海",isTravel:true,atividades:[{txt:"The Bund ao pôr-do-sol",tipo:"ativ",cn:{big:"外滩",pinyin:"Wàitān",pt:"The Bund",addr:"Zhongshan East 1st Rd\n上海市黄浦区中山东一路"}},{txt:"Transfer estação → hotel",tipo:"info"}]},
+    {dia:12,data:"9 set, Qua",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Shanghai Disneyland — full day",tipo:"ativ",link:"https://www.shanghaidisneyresort.com",cn:{big:"迪士尼",pinyin:"Dí shì ní",pt:"Shanghai Disneyland",addr:"310 Shendi West Rd\n上海市浦东新区"}},{txt:"Metro linha 11 direto",tipo:"info"}]},
+    {dia:13,data:"10 set, Qui",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Yu Garden + Tianzifang",tipo:"ativ",cn:{big:"豫园",pinyin:"Yùyuán",pt:"Yu Garden",addr:"218 Anren St\n上海市黄浦区"}},{txt:"Oriental Pearl Tower",tipo:"ativ",link:"https://www.orientalpearltower.com",cn:{big:"东方明珠",pinyin:"Dōngfāng Míngzhū",pt:"Oriental Pearl Tower",addr:"1 Century Ave\n上海市浦东新区"}},{txt:"Maglev Train (430 km/h!)",tipo:"ativ"},{txt:"Metro",tipo:"info"}]},
+    {dia:14,data:"11 set, Sex",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Zhujiajiao water town",tipo:"ativ",cn:{big:"朱家角",pinyin:"Zhūjiājiǎo",pt:"Zhujiajiao",addr:"Qingpu District\n上海市青浦区"}},{txt:"Dia livre / shopping",tipo:"ativ"},{txt:"Metro ou tour",tipo:"info"}]},
+    {dia:15,data:"12 set, Sáb",local:"Partida Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Manhã livre",tipo:"info"},{txt:"Voo PVG → Lisboa · EK305 07:20",tipo:"info"}],transfer:{de:"Hotel Xangai",para:"Shanghai Pudong (PVG)",didi:true}}
+  ];
+  hotels = [
+    {cidade:"Pequim 北京",noites:"4 noites · 29 ago–2 set",opcoes:[{nome:"Opção A",det:"Hotel central · APA",preco:"450€",link:"https://www.booking.com/Share-rlzp5b",votos:[]},{nome:"Opção B",det:"Hotel central · APA",preco:"449€",link:"https://www.booking.com/Share-KrNHJvy",votos:["🧭"]},{nome:"Opção C",det:"Hotel central · Só aloj.",preco:"416€",link:"https://www.booking.com/Share-OWsH0Yv",votos:[]}]},
+    {cidade:"Xi'an 西安",noites:"2 noites · 2–4 set",opcoes:[{nome:"Opção A",det:"Dentro das muralhas · APA",preco:"126€",link:"https://www.booking.com/Share-V2kOgLx",votos:["🧭","📸"]},{nome:"Opção B",det:"Dentro das muralhas · APA",preco:"124€",link:"https://www.booking.com/Share-4N35rS",votos:[]}]},
+    {cidade:"Chengdu 成都",noites:"2 noites · 4–6 set",opcoes:[{nome:"Niccolo Chengdu",det:"Hotel 5* central",preco:"~260€",link:"",votos:[]}]},
+    {cidade:"Zhangjiajie 张家界",noites:"2 noites · 6–8 set",opcoes:[{nome:"Opção A",det:"Hotel Wulingyuan · APA",preco:"97€",link:"https://www.booking.com/Share-je9zvR",votos:[]}]},
+    {cidade:"Xangai 上海",noites:"4 noites · 8–12 set",opcoes:[{nome:"Opção A",det:"Hotel central · APA",preco:"556€",link:"https://www.booking.com/Share-JDO0i5",votos:["🧭"]},{nome:"Opção B",det:"Hotel central · APA",preco:"530€",link:"https://www.booking.com/Share-xLEfqzu",votos:[]}]}
+  ];
+  mapStops = [
+    {cidade:"Lisboa",sub:"Partida · 28 ago 21:25",filled:true,travel:{tipo:"Voo ida · Emirates",nome:"EK194 + EK308",p1:"LIS 21:25 → DXB 08:05 (+1)",p2:"DXB 10:40 → PEK 22:20",dur:"17h55 · 1 escala · 2h35",custo:"~1000€/pax",link:"https://www.emirates.com",transfer:"PEK Airport → Hotel (Didi)"}},
+    {cidade:"Pequim 北京",sub:"29 ago – 2 set · 4 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G323",p1:"Beijing South 15:00",p2:"Xi'an North 19:12",dur:"4h12m · ~85€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Xi'an North → Hotel (Didi)"}},
+    {cidade:"Xi'an 西安",sub:"2 – 4 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G321",p1:"Xi'an North 07:03",p2:"Chengdu East 11:06",dur:"3h33m · ~35€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Chengdu East → Hotel (Didi)"}},
+    {cidade:"Chengdu 成都",sub:"4 – 6 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G2445",p1:"Chengdu East 08:00",p2:"Zhangjiajie West 11:58",dur:"3h58m · ~61€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Zhangjiajie West → Hotel (Didi)"}},
+    {cidade:"Zhangjiajie 张家界",sub:"6 – 8 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G1367",p1:"Zhangjiajie West 07:28",p2:"Shanghai Hongqiao 16:25",dur:"8h57m · ~115€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Shanghai Hongqiao → Hotel (Didi)"}},
+    {cidade:"Xangai 上海",sub:"8 – 12 set · 4 noites",filled:true,travel:{tipo:"Voo regresso · Emirates",nome:"EK305 + EK193",p1:"PVG 07:20 → DXB 12:00",p2:"DXB 14:25 → LIS 19:40",dur:"19h20 · 1 escala · 2h25",custo:"~1000€/pax",link:"https://www.emirates.com",transfer:"Hotel → PVG (Didi)"}},
+    {cidade:"Lisboa",sub:"Chegada · 12 set 19:40",filled:false,travel:null}
+  ];
+  costs = [
+    {nome:"Voos Emirates LIS↔PEK/PVG",pp_adult:1000,pp_child:800,pago:true,real:false},
+    {nome:"Universal Studios Beijing",pp_adult:70,pp_child:70,pago:false,real:false},
+    {nome:"Grande Muralha Mutianyu",pp_adult:33,pp_child:33,pago:false,real:false},
+    {nome:"Comboio G323 Pequim→Xi'an",pp_adult:85,pp_child:43,pago:false,real:false},
+    {nome:"Exército de Terracota",pp_adult:18,pp_child:18,pago:false,real:false},
+    {nome:"Comboio G321 Xi'an→Chengdu",pp_adult:35,pp_child:18,pago:false,real:false},
+    {nome:"Panda Base Chengdu",pp_adult:10,pp_child:10,pago:false,real:false},
+    {nome:"Comboio G2445 Chengdu→Zhangjiajie",pp_adult:61,pp_child:31,pago:false,real:false},
+    {nome:"Parque Zhangjiajie",pp_adult:45,pp_child:45,pago:false,real:false},
+    {nome:"Comboio G1367 Zhangjiajie→Xangai",pp_adult:115,pp_child:58,pago:false,real:false},
+    {nome:"Shanghai Disneyland",pp_adult:82,pp_child:82,pago:false,real:false},
+    {nome:"Oriental Pearl Tower",pp_adult:28,pp_child:28,pago:false,real:false},
+    {nome:"Alojamento 14 noites",pp_adult:300,pp_child:0,pago:false,real:false}
+  ];
+  priceRef = [
+    {item:"Água 500ml",cny:3},{item:"Cerveja local",cny:8},{item:"Café",cny:25},
+    {item:"Street food (refeição)",cny:20},{item:"Restaurante por pessoa",cny:80},
+    {item:"Metro por viagem",cny:5},{item:"Didi 5km",cny:20},{item:"Táxi 10km",cny:40},
+    {item:"Entrada museu médio",cny:60},{item:"Água 1.5L",cny:4},
+    {item:"Snack supermercado",cny:10},{item:"Gelado",cny:8}
+  ];
+  stateItems = [
+    {label:"Voos reservados",on:true},
+    {label:"WeChat Pay configurado",on:false},
+    {label:"VPN instalada",on:false},
+    {label:"SIM card / eSIM",on:false},
+    {label:"Seguro de viagem",on:false},
+    {label:"Comboios reservados",on:false}
+  ];
+  // Update header with fallback info
+  document.getElementById('hdr-sub').textContent = 'Percurso B · 29 ago – 12 set · 4 pessoas';
+  document.getElementById('w-sub').textContent = '29 ago → 12 set · 4 participantes';
+  updateCountdown('2026-08-29');
+  renderWelcome();
+  showScreen('welcome');
+}
+
+// ═══ SCREEN MANAGEMENT ═══
+function showScreen(name) {
+  ['loading','welcome','error','main'].forEach(s => {
+    const el = document.getElementById('scr-'+s);
+    if (el) el.classList.toggle('active', s === name);
+  });
+}
+
+// ═══ WELCOME ═══
+function renderWelcome() {
+  const list = document.getElementById('pax-list');
+  list.innerHTML = participants.map((p, i) => `
+    <div class="pax-opt" onclick="selectPax(${i})" id="pax-${i}">
+      <div class="pax-icon">${p.icon}</div>
+      <div class="pax-info">
+        <div class="pax-name">${p.nome}</div>
+        <div class="pax-role">${p.tipo === 'criança' ? 'Criança' : 'Adulto'}</div>
+      </div>
+      <span class="pax-status ${p.pago ? 'ps-ok' : 'ps-pend'}">${p.pago ? 'Pago' : 'Pendente'}</span>
+    </div>`).join('');
+}
+
+let selPaxIdx = -1;
+function selectPax(i) {
+  selPaxIdx = i;
+  document.querySelectorAll('.pax-opt').forEach((el, j) => el.classList.toggle('sel', j === i));
+  const btn = document.getElementById('w-enter');
+  btn.disabled = false;
+  btn.textContent = `Entrar como ${participants[i].nome} →`;
+}
+
+function enterApp() {
+  if (selPaxIdx < 0) return;
+  currentUser = participants[selPaxIdx];
+  document.getElementById('hdr-icon').textContent = currentUser.icon;
+  document.getElementById('hdr-name').textContent = currentUser.nome;
+  showScreen('main');
+  renderAll();
+}
+
+function switchUser() {
+  selPaxIdx = -1;
+  showScreen('welcome');
+  document.querySelectorAll('.pax-opt').forEach(el => el.classList.remove('sel'));
+  document.getElementById('w-enter').disabled = true;
+  document.getElementById('w-enter').textContent = 'Seleciona o teu perfil';
+}
+
+// ═══ SECTION NAV ═══
+function showSec(id, btn) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nb,.bnb').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  // sync active state between top and bottom nav
+  const idx = ['geral','itin','hotels','mapa','custos','conv'].indexOf(id);
+  document.querySelectorAll('.bnb')[idx]?.classList.add('active');
+  document.querySelectorAll('.nb')[idx]?.classList.add('active');
+  const fab = document.getElementById('fab');
+  fab.style.display = id === 'itin' ? 'flex' : 'none';
+}
+
+// ═══ COUNTDOWN ═══
+function updateCountdown(dateStr) {
+  const src = dateStr || document.getElementById('cfg-start')?.value || '2026-08-29';
+  const d = new Date(src);
+  const diff = Math.ceil((d - new Date()) / 86400000);
+  document.getElementById('cdown').textContent = diff > 0 ? diff : '—';
+}
+
+// ═══ CONFIG ═══
+function toggleCfg() {
+  const b = document.getElementById('cfg-body');
+  const open = b.classList.toggle('open');
+  document.getElementById('cfg-arr').textContent = open ? '˅' : '›';
+}
+
+function renderStateRows() {
+  document.getElementById('state-rows').innerHTML = stateItems.map((s, i) => `
+    <div class="state-row">
+      <span class="state-lbl">${s.label}</span>
+      <button class="tog ${s.on?'on':'off'}" onclick="stateItems[${i}].on=!stateItems[${i}].on;renderStateRows()"></button>
+    </div>`).join('');
+}
+
+function getPax() {
+  const adults = participants.filter(p => p.tipo === 'adulto').length;
+  const children = participants.filter(p => p.tipo === 'criança').length;
+  return { adults, children, total: adults + children };
+}
+
+function renderParticipants() {
+  const pax = getPax();
+  document.getElementById('vg-pax').textContent = pax.total;
+  document.getElementById('p-list').innerHTML = participants.map((p, i) => `
+    <div class="pr">
+      <div class="pav2">${p.icon}</div>
+      <div style="flex:1">
+        <input class="pname" value="${p.nome}" onchange="participants[${i}].nome=this.value">
+        <div style="display:flex;gap:6px;align-items:center;margin-top:3px">
+          <select class="ptype-sel" onchange="participants[${i}].tipo=this.value;renderParticipants();renderCosts()">
+            <option ${p.tipo==='adulto'?'selected':''}>adulto</option>
+            <option ${p.tipo==='criança'?'selected':''}>criança</option>
+          </select>
+          <span class="badge ${p.pago?'bok':'bpend'}" onclick="participants[${i}].pago=!participants[${i}].pago;renderParticipants()" style="cursor:pointer">${p.pago?'Pago':'Pendente'}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function addP() {
+  participants.push({ ini: '🌏', nome: 'Novo participante', tipo: 'adulto', icon: '🌏', pago: false });
+  renderParticipants();
+}
+
+// ═══ BUDGET BARS ═══
+function renderBudgetBars() {
+  const pax = getPax();
+  const cats = [
+    { label: 'Voos', val: (pax.adults * 1000) + (pax.children * 800), cor: '#C0392B' },
+    { label: 'Transportes internos', val: (pax.adults * 296) + (pax.children * 150), cor: '#C9960C' },
+    { label: 'Alojamento', val: 1201, cor: '#2E7D32' },
+    { label: 'Atividades', val: (pax.adults * 188) + (pax.children * 188), cor: '#6A1B9A' },
+    { label: 'Comida & extras', val: pax.total * 400, cor: '#D84315' }
+  ];
+  const total = cats.reduce((s, c) => s + c.val, 0);
+  document.getElementById('budget-bars').innerHTML = cats.map(c => `
+    <div class="bbar">
+      <div class="bbar-top"><span class="bbar-lbl">${c.label}</span><span class="bbar-val">${Math.round(c.val)}€</span></div>
+      <div class="bbar-track"><div class="bbar-fill" style="width:${Math.round(c.val/total*100)}%;background:${c.cor}"></div></div>
+    </div>`).join('');
+}
+
+// ═══ SYNC BAR ═══
+function renderSyncBars() {
+  const html = syncTime ? `
+    <div class="sync-bar">
+      <div class="sync-dot"></div>
+      Dados sincronizados com Google Sheet
+      <span class="sync-time">Hoje ${syncTime}</span>
+    </div>` : `
+    <div class="sync-bar" style="background:var(--goldl);color:var(--goldd)">
+      Modo demonstração — ligar Google Sheet no ficheiro index.html
+    </div>`;
+  document.getElementById('sync-bar-geral').innerHTML = html;
+  document.getElementById('sync-bar-conv').innerHTML = html;
+}
+
+// ═══ ITINERARY ═══
+function renderItin() {
+  document.getElementById('ap-day').innerHTML = days.map((d, i) =>
+    `<option value="${i}">Dia ${d.dia} · ${d.local}</option>`).join('');
+
+  document.getElementById('itin-list').innerHTML = days.map((d, i) => `
+    <div class="day-card">
+      <div class="dhdr" onclick="toggleDay(${i})">
+        <div class="dnum ${d.isTravel?'travel':''}">${d.dia}</div>
+        <div style="flex:1">
+          <div class="dcity">${d.local}<span class="dhz">${d.hanzi}</span></div>
+          <div class="ddate">${d.data}</div>
+        </div>
+        ${d.isTravel ? `<span class="badge bgold" style="margin-right:6px;font-size:9px">viagem</span>` : ''}
+        <span class="darr" id="darr-${i}">›</span>
+      </div>
+      <div class="dbody" id="db-${i}">
+        ${d.isTravel ? `<button class="mapbtn" onclick="goToMap()">Ver deslocação no mapa →</button>` : ''}
+        ${d.transfer ? `<div class="tr-strip"><span class="tr-badge">Transfer</span><span style="font-size:11px;color:var(--gray)">${d.transfer.de} → ${d.transfer.para}</span>${d.transfer.didi ? `<a href="https://www.didiglobal.com" target="_blank" style="font-size:10px;padding:2px 8px;border-radius:20px;text-decoration:none;background:#FF6600;color:#fff;font-weight:500">Didi</a>` : ''}</div>` : ''}
+        ${d.atividades.map(a => a.tipo === 'ativ' ? `
+        <div class="arow">
+          <input type="checkbox" class="acb">
+          <div>
+            <div class="atext">${a.txt}</div>
+            ${a.link ? `<a class="alink" href="${a.link}" target="_blank">Site oficial →</a>` : ''}
+            ${a.cn ? `<button class="acnbtn" onclick='showCN(${JSON.stringify(a.cn)})'>中 Mostrar em chinês</button>` : ''}
+          </div>
+        </div>` : `
+        <div class="ainfo"><div class="adot"></div><div class="ainfo-t">${a.txt}</div></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleDay(i) {
+  const b = document.getElementById('db-'+i);
+  const a = document.getElementById('darr-'+i);
+  a.classList.toggle('open', b.classList.toggle('open'));
+}
+
+function goToMap() {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nb,.bnb').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-mapa').classList.add('active');
+  document.querySelectorAll('.nb')[3]?.classList.add('active');
+  document.querySelectorAll('.bnb')[3]?.classList.add('active');
+  document.getElementById('fab').style.display = 'none';
+}
+
+function openAddPanel() { document.getElementById('add-panel').classList.add('open'); }
+function closeAddPanel() {
+  document.getElementById('add-panel').classList.remove('open');
+  document.getElementById('ap-desc').value = '';
+  document.getElementById('ap-link').value = '';
+}
+function saveActivity() {
+  const di = parseInt(document.getElementById('ap-day').value);
+  const desc = document.getElementById('ap-desc').value.trim();
+  if (!desc) return;
+  days[di].atividades.push({
+    txt: desc,
+    tipo: document.getElementById('ap-tipo').value,
+    link: document.getElementById('ap-link').value.trim() || ''
+  });
+  closeAddPanel();
+  renderItin();
+}
+document.getElementById('fab').onclick = openAddPanel;
+
+// ═══ CHINESE CARD ═══
+function showCN(cn) {
+  document.getElementById('cn-big').textContent = cn.big;
+  document.getElementById('cn-pinyin').textContent = cn.pinyin;
+  document.getElementById('cn-pt').textContent = cn.pt;
+  document.getElementById('cn-addr').textContent = cn.addr;
+  document.getElementById('cn-overlay').classList.add('open');
+}
+function closeCN() { document.getElementById('cn-overlay').classList.remove('open'); }
+
+// ═══ HOTELS ═══
+function renderHotels() {
+  document.getElementById('hotels-list').innerHTML = hotels.map((h, ci) => `
+    <div class="hcard">
+      <div class="hchdr">${h.cidade} · ${h.noites}<button class="card-act" onclick="toggleAddHotel(${ci})">+ Opção</button></div>
+      ${h.opcoes.map((o, oi) => `
+        <div class="hopt">
+          <input type="radio" class="hrad" name="h${ci}" ${oi===0?'checked':''}>
+          <div class="hinfo">
+            <div class="hname">${o.nome}</div>
+            <div class="hdet">${o.det}</div>
+            ${o.link ? `<a class="hbkl" href="${o.link}" target="_blank">Ver no Booking.com →</a>` : `<span style="font-size:11px;color:var(--gray)">A confirmar</span>`}
+            <div class="vrow">
+              <button class="vbtn ${o.votos.includes(currentUser?.icon)?'voted':''}" onclick="vote(${ci},${oi})">${o.votos.includes(currentUser?.icon)?'✓ Votado':'Votar'}</button>
+              <span class="vicons">${o.votos.length ? o.votos.join(' ') : '—'}</span>
+            </div>
+          </div>
+          <div class="hpr"><div class="hprice">${o.preco}</div><div class="hpsub">família</div></div>
+        </div>`).join('')}
+      <div class="hadd-form" id="hadd-${ci}">
+        <input class="hadd-inp" id="hn-${ci}" placeholder="Nome do hotel ou opção">
+        <div class="hadd-row">
+          <input class="hadd-inp" id="hpr-${ci}" placeholder="Preço total €" style="flex:1">
+          <input class="hadd-inp" id="hl-${ci}" placeholder="Link Booking" style="flex:2">
+        </div>
+        <div class="hadd-row">
+          <button class="hadd-btn p" onclick="saveHotel(${ci})">Guardar</button>
+          <button class="hadd-btn s" onclick="toggleAddHotel(${ci})">Cancelar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleAddHotel(ci) { document.getElementById('hadd-'+ci).classList.toggle('open'); }
+function saveHotel(ci) {
+  const nome = document.getElementById('hn-'+ci).value || 'Nova opção';
+  const preco = document.getElementById('hpr-'+ci).value;
+  const link = document.getElementById('hl-'+ci).value || '';
+  hotels[ci].opcoes.push({ nome, det: 'Nova opção', preco: preco ? preco+'€' : '—', link, votos: [] });
+  renderHotels();
+}
+function vote(ci, oi) {
+  if (!currentUser) return;
+  const o = hotels[ci].opcoes[oi];
+  const idx = o.votos.indexOf(currentUser.icon);
+  if (idx > -1) o.votos.splice(idx, 1); else o.votos.push(currentUser.icon);
+  renderHotels();
+}
+
+// ═══ MAP ═══
+function renderMap() {
+  document.getElementById('map-route').innerHTML = mapStops.map((s, i) => `
+    <div class="mstop">
+      <div class="mcol">
+        <div class="mdot ${s.filled?'f':''}"></div>
+        ${i < mapStops.length-1 ? '<div class="mline"></div>' : ''}
+      </div>
+      <div class="minfo">
+        <div class="mcity">${s.cidade}</div>
+        <div class="msub">${s.sub}</div>
+        ${s.travel ? `<div class="mtb">
+          <div class="mtbl">${s.travel.tipo} · ${s.travel.nome}</div>
+          <div class="mtbm">${s.travel.p1}</div>
+          <div class="mtbm">${s.travel.p2}</div>
+          <div class="mtbd">${s.travel.dur}${s.travel.custo?' · '+s.travel.custo:''}</div>
+          <div class="mtblinks">
+            <a class="mtbl-a mtbl-book" href="${s.travel.link}" target="_blank">Reservar</a>
+            <a class="mtbl-a mtbl-didi" href="https://www.didiglobal.com" target="_blank">Didi</a>
+            <a class="mtbl-a mtbl-amap" href="https://uri.amap.com" target="_blank">Amap</a>
+          </div>
+          ${s.travel.transfer ? `<div class="mtrf">Transfer: ${s.travel.transfer}</div>` : ''}
+        </div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ═══ COSTS ═══
+function calcTotal(c) {
+  const pax = getPax();
+  return c.pp_adult * pax.adults + c.pp_child * pax.children;
+}
+function renderCosts() {
+  let pago = 0, pend = 0;
+  costs.forEach(c => { const t = calcTotal(c); if (c.pago) pago += t; else pend += t; });
+  document.getElementById('c-pago').textContent = Math.round(pago)+'€';
+  document.getElementById('c-pend').textContent = Math.round(pend)+'€';
+  document.getElementById('vg-pago').textContent = Math.round(pago)+'€';
+  document.getElementById('costs-list').innerHTML = costs.map((c, i) => {
+    const t = calcTotal(c);
+    return `<div class="cost-row">
+      <input type="checkbox" class="cost-cb" ${c.pago?'checked':''} onchange="costs[${i}].pago=this.checked;if(this.checked)costs[${i}].real=false;renderCosts()">
+      <div class="cost-body">
+        <input class="cost-name" value="${c.nome}" onchange="costs[${i}].nome=this.value">
+        <div class="cost-meta">
+          <span class="cost-lbl">Adulto</span>
+          <input class="cost-inp" type="number" value="${c.pp_adult}" onchange="costs[${i}].pp_adult=parseFloat(this.value)||0;renderCosts()">
+          <span class="cost-lbl">€ · Criança</span>
+          <input class="cost-inp" type="number" value="${c.pp_child}" onchange="costs[${i}].pp_child=parseFloat(this.value)||0;renderCosts()">
+          <span class="cost-lbl">€</span>
+        </div>
+      </div>
+      <div class="cost-right">
+        <div class="cost-total">${Math.round(t)}€</div>
+        <div class="cost-status ${c.pago?'cs-paid':c.real?'cs-real':'cs-budget'}" onclick="cycleStatus(${i})" title="Clica para mudar estado">${c.pago?'✓ pago':c.real?'real':'orçam.'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function cycleStatus(i) {
+  const c = costs[i];
+  if (c.pago) { c.pago = false; c.real = true; }
+  else if (c.real) { c.real = false; }
+  else { c.pago = true; c.real = false; }
+  renderCosts();
+}
+function addCost() {
+  costs.push({ nome: 'Nova despesa', pp_adult: 0, pp_child: 0, pago: false, real: false });
+  renderCosts();
+}
+
+// ═══ CONVERTER ═══
+function updateConv() { renderPrices(); }
+function fromEur() {
+  const r = parseFloat(document.getElementById('rate-val').value) || 7.85;
+  document.getElementById('conv-cny').value = ((parseFloat(document.getElementById('conv-eur').value)||0)*r).toFixed(2);
+}
+function fromCny() {
+  const r = parseFloat(document.getElementById('rate-val').value) || 7.85;
+  document.getElementById('conv-eur').value = ((parseFloat(document.getElementById('conv-cny').value)||0)/r).toFixed(2);
+}
+function renderPrices() {
+  const r = parseFloat(document.getElementById('rate-val').value) || 7.85;
+  document.getElementById('price-ref').innerHTML = priceRef.map(p => `
+    <div class="prow">
+      <span class="pitem">${p.item}</span>
+      <span class="pcny">${p.cny}¥</span>
+      <span class="peur">${(p.cny/r).toFixed(2)}€</span>
+    </div>`).join('');
+}
+
+// ═══ FLIGHTS (static, from itinerary planning) ═══
+function renderFlights() {
+  // Flights are shown in the Mapa section as first/last map stops
+}
+
+// ═══ RENDER ALL ═══
+function renderAll() {
+  renderStateRows();
+  renderParticipants();
+  renderBudgetBars();
+  renderSyncBars();
+  renderItin();
+  renderHotels();
+  renderMap();
+  renderCosts();
+  renderPrices();
+  updateCountdown();
+}
+
+// ═══ START ═══
+init();
+</script>
+</body>
+</html>

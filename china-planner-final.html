@@ -189,7 +189,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .ainfo:last-child{border-bottom:none}
 .adot{width:4px;height:4px;border-radius:50%;background:var(--gray);margin-top:7px;flex-shrink:0}
 .ainfo-t{font-size:12px;color:var(--gray);flex:1;line-height:1.5}
-.mapbtn{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--red);background:var(--redl);border:none;border-radius:20px;padding:5px 12px;cursor:pointer;font-family:var(--font);font-weight:500;margin-bottom:8px}
 .tr-strip{display:flex;align-items:center;gap:6px;padding:5px 0;margin-bottom:6px;flex-wrap:wrap}
 .tr-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--goldl);color:var(--goldd);font-weight:500}
 
@@ -219,6 +218,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .hname{font-size:13px;font-weight:500}
 .hdet{font-size:11px;color:var(--gray);margin-top:2px}
 .hbkl{font-size:11px;color:var(--red);text-decoration:none;display:block;margin-top:4px;font-weight:500}
+.hsearchl{display:block;text-align:center;font-size:11px;font-weight:600;color:var(--red);text-decoration:none;background:var(--redl);border-radius:var(--radius-sm);padding:8px;margin-top:8px}
 .hpr{text-align:right;flex-shrink:0}
 .hprice{font-size:15px;font-weight:600;color:var(--red)}
 .hpsub{font-size:10px;color:var(--gray)}
@@ -234,15 +234,7 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .hadd-btn.p{background:var(--red);color:#fff;border:none}
 .hadd-btn.s{background:none;color:var(--gray);border:1px solid var(--border)}
 
-/* MAP */
-.mstop{display:flex;gap:12px;align-items:stretch}
-.mcol{display:flex;flex-direction:column;align-items:center;width:18px;flex-shrink:0}
-.mdot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:4px;border:2px solid var(--red)}
-.mdot.f{background:var(--red)}
-.mline{flex:1;width:2px;background:var(--red);opacity:0.15;min-height:24px}
-.minfo{flex:1;padding-bottom:1.25rem}
-.mcity{font-size:15px;font-weight:600;letter-spacing:-0.2px}
-.msub{font-size:11px;color:var(--gray);margin-top:2px}
+/* TRAVEL CARD (embedded in day itinerary) */
 .mtb{background:var(--red);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-top:10px}
 .mtbl{font-size:10px;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;font-weight:600}
 .mtbm{font-size:13px;font-weight:500;color:#fff;line-height:1.6}
@@ -385,7 +377,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
     <button class="nb active" onclick="showSec('geral',this)"><span class="ni">⊞</span>Geral</button>
     <button class="nb" onclick="showSec('itin',this)"><span class="ni">◷</span>Itinerário</button>
     <button class="nb" onclick="showSec('hotels',this)"><span class="ni">⌂</span>Hotéis</button>
-    <button class="nb" onclick="showSec('mapa',this)"><span class="ni">↗</span>Mapa</button>
     <button class="nb" onclick="showSec('custos',this)"><span class="ni">¥</span>Custos</button>
     <button class="nb" onclick="showSec('conv',this)"><span class="ni">⇄</span>Câmbio</button>
   </div>
@@ -437,10 +428,10 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
         <div style="height:0.75rem"></div>
         <div class="card" style="margin-bottom:0.5rem">
           <div class="card-t">Detalhes</div>
-          <div class="fr"><span class="fl">Destino</span><input class="fi" id="cfg-dest" value="China"></div>
-          <div class="fr"><span class="fl">Início</span><input class="fi" type="date" id="cfg-start" onchange="updateCountdown()"></div>
-          <div class="fr"><span class="fl">Fim</span><input class="fi" type="date" id="cfg-end"></div>
-          <div class="fr"><span class="fl">Percurso</span><input class="fi" id="cfg-perc" value="Percurso B"></div>
+          <div class="fr"><span class="fl">Destino</span><input class="fi" id="cfg-dest" value="China" onchange="apiPost({action:'state',key:'destino',value:this.value})"></div>
+          <div class="fr"><span class="fl">Início</span><input class="fi" type="date" id="cfg-start" onchange="updateCountdown();apiPost({action:'state',key:'data_inicio',value:this.value})"></div>
+          <div class="fr"><span class="fl">Fim</span><input class="fi" type="date" id="cfg-end" onchange="apiPost({action:'state',key:'data_fim',value:this.value})"></div>
+          <div class="fr"><span class="fl">Percurso</span><input class="fi" id="cfg-perc" value="Percurso B" onchange="apiPost({action:'state',key:'percurso',value:this.value})"></div>
         </div>
         <div class="card" style="margin-bottom:0.5rem">
           <div class="card-tr"><span class="card-t" style="margin:0">Participantes</span><button class="card-act" onclick="addP()">+ Adicionar</button></div>
@@ -460,18 +451,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
     <div class="sec" id="sec-itin">
       <div class="sh"><span class="sh-t">Itinerário</span><span class="sh-line"></span><span class="sh-hz">行程</span></div>
       <div id="itin-list"></div>
-    </div>
-
-    <!-- HOTÉIS -->
-    <div class="sec" id="sec-hotels">
-      <div class="sh"><span class="sh-t">Alojamento</span><span class="sh-line"></span><span class="sh-hz">住宿</span></div>
-      <div id="hotels-list"></div>
-    </div>
-
-    <!-- MAPA -->
-    <div class="sec" id="sec-mapa">
-      <div class="sh"><span class="sh-t">Percurso & deslocações</span><span class="sh-line"></span><span class="sh-hz">路线</span></div>
-      <div class="card"><div id="map-route"></div></div>
       <div class="card">
         <div class="card-t">Navegação local</div>
         <div class="fr" style="flex-direction:column;align-items:flex-start;gap:3px;padding:10px 0">
@@ -485,6 +464,12 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
           <a href="https://uri.amap.com" target="_blank" style="font-size:12px;color:var(--red);font-weight:500">Abrir Amap →</a>
         </div>
       </div>
+    </div>
+
+    <!-- HOTÉIS -->
+    <div class="sec" id="sec-hotels">
+      <div class="sh"><span class="sh-t">Alojamento</span><span class="sh-line"></span><span class="sh-hz">住宿</span></div>
+      <div id="hotels-list"></div>
     </div>
 
     <!-- CUSTOS -->
@@ -539,7 +524,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
     <button class="bnb active" onclick="showSec('geral',this)"><span class="bni">⊞</span>Geral</button>
     <button class="bnb" onclick="showSec('itin',this)"><span class="bni">◷</span>Itinerário</button>
     <button class="bnb" onclick="showSec('hotels',this)"><span class="bni">⌂</span>Hotéis</button>
-    <button class="bnb" onclick="showSec('mapa',this)"><span class="bni">↗</span>Mapa</button>
     <button class="bnb" onclick="showSec('custos',this)"><span class="bni">¥</span>Custos</button>
     <button class="bnb" onclick="showSec('conv',this)"><span class="bni">⇄</span>Câmbio</button>
   </div>
@@ -708,7 +692,9 @@ function parseData(data) {
   // Itinerário — parse posicional (col0=dia, col1=data, col2=local, col3=hanzi,
   // col4=viagem, col5=atividade, col6=tipo_ativ, col7=link, col8=cn_hanzi,
   // col9=cn_pinyin, col10=cn_pt, col11=cn_addr, col12=transfer,
-  // col13=transfer_de, col14=transfer_para, col15=didi)
+  // col13=transfer_de, col14=transfer_para, col15=didi, col16=travel_tipo,
+  // col17=travel_nome, col18=travel_p1, col19=travel_p2, col20=travel_dur,
+  // col21=travel_custo, col22=travel_link)
   days = [];
   let currentDay = null;
   const itin = data.itinerario || [];
@@ -732,6 +718,13 @@ function parseData(data) {
     const col13 = (vals[13]||'').trim();
     const col14 = (vals[14]||'').trim();
     const col15 = (vals[15]||'').trim();
+    const col16 = (vals[16]||'').trim();
+    const col17 = (vals[17]||'').trim();
+    const col18 = (vals[18]||'').trim();
+    const col19 = (vals[19]||'').trim();
+    const col20 = (vals[20]||'').trim();
+    const col21 = (vals[21]||'').trim();
+    const col22 = (vals[22]||'').trim();
 
     const diaNum = parseInt(col0);
     if (!isNaN(diaNum) && diaNum > 0 && col2) {
@@ -743,7 +736,8 @@ function parseData(data) {
         hanzi: col3,
         isTravel: col4 === 'TRUE',
         atividades: [],
-        transfer: col12 === 'TRUE' ? { de: col13, para: col14, didi: col15 === 'TRUE' } : null
+        transfer: col12 === 'TRUE' ? { de: col13, para: col14, didi: col15 === 'TRUE' } : null,
+        travel: col16 ? { tipo: col16, nome: col17, p1: col18, p2: col19, dur: col20, custo: col21, link: col22 } : null
       };
       days.push(currentDay);
     } else if (currentDay && col5) {
@@ -757,7 +751,7 @@ function parseData(data) {
     }
   });
 
-  // Hotéis — col0=cidade, col1=noites, col2=nome_hotel, col3=detalhe, col4=preco, col5=link, col6=votos
+  // Hotéis — col0=cidade, col1=noites, col2=nome_hotel, col3=detalhe, col4=preco, col5=link, col6=votos, col7=search_link (na linha da cidade)
   hotels = [];
   let currentHotel = null;
   (data.hoteis || []).forEach(r => {
@@ -769,8 +763,9 @@ function parseData(data) {
     const col4 = (vals[4]||'').trim();
     const col5 = (vals[5]||'').trim();
     const col6 = (vals[6]||'').trim();
+    const col7 = (vals[7]||'').trim();
     if (col0 && !col2 && col0 !== 'cidade' && !col0.includes('ALOJAMENTO')) {
-      currentHotel = { cidade: col0, noites: col1, opcoes: [] };
+      currentHotel = { cidade: col0, noites: col1, opcoes: [], searchLink: col7 || '' };
       hotels.push(currentHotel);
     } else if (currentHotel && col2 && col2 !== 'nome_hotel') {
       currentHotel.opcoes.push({
@@ -778,31 +773,6 @@ function parseData(data) {
         votos: col6 ? col6.split(',').map(v=>v.trim()).filter(Boolean) : []
       });
     }
-  });
-
-  // Mapa — col0=cidade, col1=sub, col2=filled, col3=tipo_transp, col4=nome_transp,
-  // col5=partida, col6=chegada, col7=duracao, col8=custo, col9=link_reserva, col10=transfer_info
-  mapStops = (data.mapa || []).filter(r => {
-    const v = Object.values(r);
-    const c0 = (v[0]||'').trim();
-    return c0 && c0 !== 'cidade' && !c0.includes('MAPA') && !c0.includes('PERCURSO');
-  }).map(r => {
-    const vals = Object.values(r);
-    const col0 = (vals[0]||'').trim();
-    const col1 = (vals[1]||'').trim();
-    const col2 = (vals[2]||'').trim();
-    const col3 = (vals[3]||'').trim();
-    const col4 = (vals[4]||'').trim();
-    const col5 = (vals[5]||'').trim();
-    const col6 = (vals[6]||'').trim();
-    const col7 = (vals[7]||'').trim();
-    const col8 = (vals[8]||'').trim();
-    const col9 = (vals[9]||'').trim();
-    const col10 = (vals[10]||'').trim();
-    return {
-      cidade: col0, sub: col1, filled: col2 !== 'FALSE',
-      travel: col3 ? { tipo: col3, nome: col4, p1: col5, p2: col6, dur: col7, custo: col8, link: col9, transfer: col10 } : null
-    };
   });
 
   // Custos
@@ -1044,7 +1014,7 @@ function showSec(id, btn) {
   document.getElementById('sec-'+id).classList.add('active');
   btn.classList.add('active');
   // sync active state between top and bottom nav
-  const idx = ['geral','itin','hotels','mapa','custos','conv'].indexOf(id);
+  const idx = ['geral','itin','hotels','custos','conv'].indexOf(id);
   document.querySelectorAll('.bnb')[idx]?.classList.add('active');
   document.querySelectorAll('.nb')[idx]?.classList.add('active');
   const fab = document.getElementById('fab');
@@ -1087,13 +1057,13 @@ function renderParticipants() {
     <div class="pr">
       <div class="pav2">${p.icon}</div>
       <div style="flex:1">
-        <input class="pname" value="${p.nome}" onchange="participants[${i}].nome=this.value">
+        <input class="pname" value="${p.nome}" onchange="participants[${i}].nome=this.value;apiPost({action:'edit_participant',row_idx:${i},nome:participants[${i}].nome,tipo:participants[${i}].tipo,pago:participants[${i}].pago})">
         <div style="display:flex;gap:6px;align-items:center;margin-top:3px">
-          <select class="ptype-sel" onchange="participants[${i}].tipo=this.value;renderParticipants();renderCosts()">
+          <select class="ptype-sel" onchange="participants[${i}].tipo=this.value;renderParticipants();renderCosts();apiPost({action:'edit_participant',row_idx:${i},nome:participants[${i}].nome,tipo:participants[${i}].tipo,pago:participants[${i}].pago})">
             <option ${p.tipo==='adulto'?'selected':''}>adulto</option>
             <option ${p.tipo==='criança'?'selected':''}>criança</option>
           </select>
-          <span class="badge ${p.pago?'bok':'bpend'}" onclick="participants[${i}].pago=!participants[${i}].pago;renderParticipants()" style="cursor:pointer">${p.pago?'Pago':'Pendente'}</span>
+          <span class="badge ${p.pago?'bok':'bpend'}" onclick="participants[${i}].pago=!participants[${i}].pago;renderParticipants();apiPost({action:'edit_participant',row_idx:${i},nome:participants[${i}].nome,tipo:participants[${i}].tipo,pago:participants[${i}].pago})" style="cursor:pointer">${p.pago?'Pago':'Pendente'}</span>
         </div>
       </div>
     </div>`).join('');
@@ -1155,7 +1125,19 @@ function renderItin() {
         <span class="darr" id="darr-${i}">›</span>
       </div>
       <div class="dbody" id="db-${i}">
-        ${d.isTravel ? `<button class="mapbtn" onclick="goToMap()">Ver deslocação no mapa →</button>` : ''}
+        ${d.travel ? `
+        <div class="mtb">
+          <div class="mtbl">${d.travel.tipo}</div>
+          <div class="mtbm">${d.travel.nome}</div>
+          <div class="mtbm">${d.travel.p1}</div>
+          <div class="mtbm">${d.travel.p2}</div>
+          <div class="mtbd">${d.travel.dur}${d.travel.custo?' · '+d.travel.custo:''}</div>
+          <div class="mtblinks">
+            ${d.travel.link ? `<a class="mtbl-a mtbl-book" href="${d.travel.link}" target="_blank">Reservar</a>` : ''}
+            <a class="mtbl-a mtbl-didi" href="https://www.didiglobal.com" target="_blank">Didi</a>
+            <a class="mtbl-a mtbl-amap" href="https://uri.amap.com" target="_blank">Amap</a>
+          </div>
+        </div>` : ''}
         ${d.transfer ? `<div class="tr-strip"><span class="tr-badge">Transfer</span><span style="font-size:11px;color:var(--gray)">${d.transfer.de} → ${d.transfer.para}</span>${d.transfer.didi ? `<a href="https://www.didiglobal.com" target="_blank" style="font-size:10px;padding:2px 8px;border-radius:20px;text-decoration:none;background:#FF6600;color:#fff;font-weight:500">Didi</a>` : ''}</div>` : ''}
         ${d.atividades.map((a, ai) => a.tipo === 'ativ' ? `
         <div class="arow">
@@ -1175,15 +1157,6 @@ function toggleDay(i) {
   const b = document.getElementById('db-'+i);
   const a = document.getElementById('darr-'+i);
   a.classList.toggle('open', b.classList.toggle('open'));
-}
-
-function goToMap() {
-  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nb,.bnb').forEach(b => b.classList.remove('active'));
-  document.getElementById('sec-mapa').classList.add('active');
-  document.querySelectorAll('.nb')[3]?.classList.add('active');
-  document.querySelectorAll('.bnb')[3]?.classList.add('active');
-  document.getElementById('fab').style.display = 'none';
 }
 
 function openAddPanel() { document.getElementById('add-panel').classList.add('open'); }
@@ -1246,6 +1219,7 @@ function renderHotels() {
           <button class="hadd-btn s" onclick="toggleAddHotel(${ci})">Cancelar</button>
         </div>
       </div>
+      ${h.searchLink ? `<a class="hsearchl" href="${h.searchLink}" target="_blank">🔍 Pesquisar hotéis em ${h.cidade.split(' ')[0]} no Booking.com →</a>` : ''}
     </div>`).join('');
 }
 
@@ -1269,32 +1243,6 @@ function vote(ci, oi) {
   apiPost({ action: 'vote', cidade_idx: ci, hotel_idx: oi, user_icon: currentUser.icon, add: adding });
 }
 
-// ═══ MAP ═══
-function renderMap() {
-  document.getElementById('map-route').innerHTML = mapStops.map((s, i) => `
-    <div class="mstop">
-      <div class="mcol">
-        <div class="mdot ${s.filled?'f':''}"></div>
-        ${i < mapStops.length-1 ? '<div class="mline"></div>' : ''}
-      </div>
-      <div class="minfo">
-        <div class="mcity">${s.cidade}</div>
-        <div class="msub">${s.sub}</div>
-        ${s.travel ? `<div class="mtb">
-          <div class="mtbl">${s.travel.tipo} · ${s.travel.nome}</div>
-          <div class="mtbm">${s.travel.p1}</div>
-          <div class="mtbm">${s.travel.p2}</div>
-          <div class="mtbd">${s.travel.dur}${s.travel.custo?' · '+s.travel.custo:''}</div>
-          <div class="mtblinks">
-            <a class="mtbl-a mtbl-book" href="${s.travel.link}" target="_blank">Reservar</a>
-            <a class="mtbl-a mtbl-didi" href="https://www.didiglobal.com" target="_blank">Didi</a>
-            <a class="mtbl-a mtbl-amap" href="https://uri.amap.com" target="_blank">Amap</a>
-          </div>
-          ${s.travel.transfer ? `<div class="mtrf">Transfer: ${s.travel.transfer}</div>` : ''}
-        </div>` : ''}
-      </div>
-    </div>`).join('');
-}
 
 // ═══ COSTS ═══
 function calcTotal(c) {
@@ -1312,12 +1260,12 @@ function renderCosts() {
     return `<div class="cost-row">
       <input type="checkbox" class="cost-cb" ${c.pago?'checked':''} onchange="costs[${i}].pago=this.checked;if(this.checked)costs[${i}].real=false;renderCosts()">
       <div class="cost-body">
-        <input class="cost-name" value="${c.nome}" onchange="costs[${i}].nome=this.value">
+        <input class="cost-name" value="${c.nome}" onchange="costs[${i}].nome=this.value;apiPost({action:'edit_cost',row_idx:${i},nome:costs[${i}].nome,pp_adult:costs[${i}].pp_adult,pp_child:costs[${i}].pp_child})">
         <div class="cost-meta">
           <span class="cost-lbl">Adulto</span>
-          <input class="cost-inp" type="number" value="${c.pp_adult}" onchange="costs[${i}].pp_adult=parseFloat(this.value)||0;renderCosts()">
+          <input class="cost-inp" type="number" value="${c.pp_adult}" onchange="costs[${i}].pp_adult=parseFloat(this.value)||0;renderCosts();apiPost({action:'edit_cost',row_idx:${i},nome:costs[${i}].nome,pp_adult:costs[${i}].pp_adult,pp_child:costs[${i}].pp_child})">
           <span class="cost-lbl">€ · Criança</span>
-          <input class="cost-inp" type="number" value="${c.pp_child}" onchange="costs[${i}].pp_child=parseFloat(this.value)||0;renderCosts()">
+          <input class="cost-inp" type="number" value="${c.pp_child}" onchange="costs[${i}].pp_child=parseFloat(this.value)||0;renderCosts();apiPost({action:'edit_cost',row_idx:${i},nome:costs[${i}].nome,pp_adult:costs[${i}].pp_adult,pp_child:costs[${i}].pp_child})">
           <span class="cost-lbl">€</span>
         </div>
       </div>
@@ -1335,7 +1283,7 @@ function cycleStatus(i) {
   else { c.pago = true; c.real = false; }
   renderCosts();
   // Save to Apps Script — +1 for header row in sheet
-  apiPost({ action: 'cost_status', row_idx: i + 1, pago: c.pago, real: c.real });
+  apiPost({ action: 'cost_status', row_idx: i, pago: c.pago, real: c.real });
 }
 function addCost() {
   const nova={nome:'Nova despesa',pp_adult:0,pp_child:0,pago:false,real:false};
@@ -1370,30 +1318,6 @@ function renderFlights() {
 
 // ═══ APPLY REMOTE DATA ═══
 function applyVotes(votes) {
-  // votes: { "0|0": ["🧭","📸"], "0|1": [] ... }
-  Object.entries(votes).forEach(([key, icons]) => {
-    const [ci, oi] = key.split('|').map(Number);
-    if (hotels[ci] && hotels[ci].opcoes[oi]) {
-      hotels[ci].opcoes[oi].votos = icons;
-    }
-  });
-}
-
-function getCheck(dayIdx, actIdx) {
-  if (!window._savedChecks) return false;
-  if (!currentUser) return false;
-  return window._savedChecks[dayIdx + '|' + actIdx + '|' + currentUser.icon] === true;
-}
-
-function saveCheckRemote(dayIdx, actIdx, checked) {
-  if (!window._savedChecks) window._savedChecks = {};
-  if (currentUser) {
-    window._savedChecks[dayIdx + '|' + actIdx + '|' + currentUser.icon] = checked;
-  }
-  apiPost({ action: 'check', day_idx: dayIdx, act_idx: actIdx, user_icon: currentUser?.icon, checked });
-}
-
-function applyVotes(votes) {
   Object.entries(votes||{}).forEach(([key,icons]) => {
     const [ci,oi] = key.split('|').map(Number);
     if (hotels[ci]&&hotels[ci].opcoes[oi]) hotels[ci].opcoes[oi].votos = Array.isArray(icons)?icons:String(icons).split(',').filter(Boolean);
@@ -1417,7 +1341,6 @@ function renderAll() {
   renderSyncBars();
   renderItin();
   renderHotels();
-  renderMap();
   renderCosts();
   renderPrices();
   updateCountdown();

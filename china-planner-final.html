@@ -800,9 +800,7 @@ function parseData(data) {
   const startDate = cfg.data_inicio || '';
   const endDate = cfg.data_fim || '';
   document.getElementById('hdr-title').textContent = tripName;
-  document.getElementById('w-title').textContent = tripName;
   document.getElementById('hdr-sub').textContent = `${cfg.percurso||'Percurso B'} · ${startDate} – ${endDate} · ${paxCount} pessoas`;
-  document.getElementById('w-sub').textContent = `${startDate} → ${endDate} · ${paxCount} participantes`;
 
   if (cfg.data_inicio) {
     document.getElementById('cfg-start').value = cfg.data_inicio;
@@ -919,7 +917,6 @@ function loadFallbackData() {
   ];
   // Update header with fallback info
   document.getElementById('hdr-sub').textContent = 'Percurso B · 29 ago – 12 set · 4 pessoas';
-  document.getElementById('w-sub').textContent = '29 ago → 12 set · 4 participantes';
   updateCountdown('2026-08-29');
   renderAll();
   showScreen('main');

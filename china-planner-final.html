@@ -31,29 +31,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .load-spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* WELCOME */
-#scr-welcome{min-height:100vh;background:var(--red);flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden}#scr-welcome.active{display:flex!important}
-.w-bg-hz{position:absolute;font-family:var(--font-cn);font-size:220px;color:rgba(255,255,255,0.05);font-weight:700;pointer-events:none;user-select:none;line-height:1}
-.w-logo{position:relative;text-align:center;margin-bottom:1.5rem}
-.w-title{font-size:30px;font-weight:600;color:#fff;letter-spacing:-0.5px}
-.w-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px}
-.w-card{background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:1.5rem;width:100%;max-width:380px}
-.w-q{font-size:14px;color:rgba(255,255,255,0.85);margin-bottom:1rem;font-weight:500}
-.pax-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem}
-.pax-opt{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(255,255,255,0.08);transition:all 0.15s}
-.pax-opt:hover{background:rgba(255,255,255,0.14)}
-.pax-opt.sel{border-color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.18)}
-.pax-icon{font-size:26px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pax-info{flex:1}
-.pax-name{font-size:14px;font-weight:500;color:#fff}
-.pax-role{font-size:11px;color:rgba(255,255,255,0.6);margin-top:1px}
-.pax-status{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
-.ps-ok{background:rgba(46,125,50,0.4);color:#A5D6A7}
-.ps-pend{background:rgba(192,57,43,0.3);color:#FFCDD2}
-.w-enter{width:100%;background:#fff;color:var(--red);border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;font-family:var(--font);cursor:pointer;margin-top:0.5rem}
-.w-enter:disabled{opacity:0.4;cursor:not-allowed}
-.w-enter:not(:disabled):active{transform:scale(0.98)}
-.w-loading-msg{font-size:12px;color:rgba(255,255,255,0.55);text-align:center;margin-top:0.75rem}
 
 /* ERROR */
 #scr-error{min-height:100vh;background:var(--red);flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}#scr-error.active{display:flex!important}
@@ -71,10 +48,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .hdr-top{padding:0.875rem 1.25rem 0;display:flex;align-items:flex-start;justify-content:space-between;position:relative}
 .hdr-title{font-size:19px;font-weight:600;color:#fff;letter-spacing:-0.3px}
 .hdr-sub{font-size:11px;color:rgba(255,255,255,0.62);margin-top:2px}
-.hdr-user{display:flex;align-items:center;gap:8px;padding:0.55rem 1.25rem;position:relative}
-.hdr-av{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:15px}
-.hdr-uname{font-size:12px;color:rgba(255,255,255,0.88);font-weight:500}
-.hdr-switch{margin-left:auto;font-size:11px;color:rgba(255,255,255,0.45);cursor:pointer;background:none;border:none;font-family:var(--font)}
 .hdr-cd{background:rgba(0,0,0,0.18);padding:5px 1.25rem;display:flex;justify-content:space-between;align-items:center}
 .hdr-cd-lbl{font-size:11px;color:rgba(255,255,255,0.55)}
 .hdr-cd-n{font-size:14px;font-weight:600;color:#fff}
@@ -213,21 +186,13 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .hchdr{padding:0.6rem 1rem;font-size:10px;font-weight:600;color:var(--red);background:var(--redl);border-bottom:1px solid var(--redb);display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;letter-spacing:0.07em}
 .hopt{padding:0.875rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;background:#fff}
 .hopt:last-child{border-bottom:none}
-.hrad{width:17px;height:17px;margin-top:2px;flex-shrink:0;accent-color:var(--red)}
 .hinfo{flex:1}
-.hname{font-size:13px;font-weight:500}
+.hname{font-size:13px;font-weight:600;color:#2E7D32}
 .hdet{font-size:11px;color:var(--gray);margin-top:2px}
 .hbkl{font-size:11px;color:var(--red);text-decoration:none;display:block;margin-top:4px;font-weight:500}
-.hsearchl{display:block;text-align:center;font-size:11px;font-weight:600;color:var(--red);text-decoration:none;background:var(--redl);border-radius:var(--radius-sm);padding:8px;margin-top:8px}
 .hpr{text-align:right;flex-shrink:0}
 .hprice{font-size:15px;font-weight:600;color:var(--red)}
 .hpsub{font-size:10px;color:var(--gray)}
-.vrow{display:flex;gap:6px;margin-top:7px;align-items:center}
-.vbtn{padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:none;cursor:pointer;font-size:11px;font-family:var(--font);color:var(--gray);font-weight:500}
-.vbtn.voted{background:var(--redl);border-color:var(--red);color:var(--redd)}
-.vicons{font-size:14px;color:var(--gray)}
-.hadd-form{padding:0.875rem 1rem;background:var(--grayl);border-top:1px solid var(--border);display:none}
-.hadd-form.open{display:block}
 .hadd-inp{width:100%;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:var(--font);background:#fff;color:var(--ink);outline:none;margin-bottom:6px}
 .hadd-row{display:flex;gap:6px}
 .hadd-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer}
@@ -245,6 +210,24 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 .mtbl-didi{background:#FF6600;color:#fff}
 .mtbl-amap{background:#1565C0;color:#fff}
 .mtrf{font-size:11px;color:rgba(255,255,255,0.65);margin-top:6px}
+
+/* CRITICAL STATION HIGHLIGHT */
+.station-crit{background:#FFF3CD;border:2px solid #E8A100;border-radius:8px;padding:8px 10px;margin:6px 0}
+.station-warn{font-size:9px;font-weight:800;color:#8A5A00;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:3px}
+.station-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.station-name{font-size:15px;font-weight:800;color:#5C3A00}
+.station-amap{font-size:10px;font-weight:700;padding:4px 9px;border-radius:20px;background:#1565C0;color:#fff;text-decoration:none;white-space:nowrap}
+.station-time{font-size:12px;font-weight:600;color:#8A5A00;margin-top:2px}
+.station-arrow{text-align:center;color:rgba(255,255,255,0.6);font-size:14px;margin:2px 0}
+.arow-links{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:2px}
+.amap-mini{font-size:11px;color:#1565C0;text-decoration:none;font-weight:500}
+.hotel-addr-crit{background:#FFF3CD;border:2px solid #E8A100;border-radius:8px;padding:8px 10px;margin:8px 0}
+.hotel-addr-warn{font-size:9px;font-weight:800;color:#8A5A00;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:3px}
+.hotel-addr-text{font-size:13px;font-weight:700;color:#5C3A00;line-height:1.4}
+.hotel-addr-links{display:flex;gap:8px;margin-top:6px}
+.hotel-addr-links a{font-size:10px;font-weight:700;padding:4px 9px;border-radius:20px;text-decoration:none}
+.hotel-addr-amap{background:#1565C0;color:#fff}
+.hotel-addr-didi{background:#FF6600;color:#fff}
 
 /* COSTS */
 .cost-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
@@ -326,20 +309,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
 </div>
 
 <!-- ═══════════════════════════════ WELCOME ═══════════════════════════════ -->
-<div id="scr-welcome" class="screen">
-  <div class="w-bg-hz">中国</div>
-  <div class="w-logo">
-    <div class="w-title" id="w-title">China 2026</div>
-    <div class="w-sub" id="w-sub">A carregar...</div>
-  </div>
-  <div class="w-card">
-    <div class="w-q">Quem és tu nesta viagem?</div>
-    <div class="pax-list" id="pax-list"></div>
-    <button class="w-enter" id="w-enter" disabled onclick="enterApp()">Seleciona o teu perfil</button>
-    <div class="w-loading-msg" id="w-msg"></div>
-  </div>
-</div>
-
 <!-- ═══════════════════════════════ MAIN APP ═══════════════════════════════ -->
 <div id="scr-main" class="screen">
 
@@ -360,11 +329,6 @@ body{font-family:var(--font);background:#EDEAE4;color:var(--ink);min-height:100v
         <div class="hdr-title" id="hdr-title">China 2026</div>
         <div class="hdr-sub" id="hdr-sub">A carregar...</div>
       </div>
-    </div>
-    <div class="hdr-user">
-      <div class="hdr-av" id="hdr-icon"></div>
-      <span class="hdr-uname" id="hdr-name"></span>
-      <button class="hdr-switch" onclick="switchUser()">trocar utilizador</button>
     </div>
     <div class="hdr-cd">
       <span class="hdr-cd-lbl">Dias até à partida</span>
@@ -751,7 +715,7 @@ function parseData(data) {
     }
   });
 
-  // Hotéis — col0=cidade, col1=noites, col2=nome_hotel, col3=detalhe, col4=preco, col5=link, col6=votos, col7=search_link (na linha da cidade)
+  // Hotéis — col0=cidade, col1=noites, col2=nome_hotel, col3=detalhe, col4=preco, col5=link, col6=votos, col7=search_link (na linha da cidade), col8=endereco
   hotels = [];
   let currentHotel = null;
   (data.hoteis || []).forEach(r => {
@@ -764,13 +728,15 @@ function parseData(data) {
     const col5 = (vals[5]||'').trim();
     const col6 = (vals[6]||'').trim();
     const col7 = (vals[7]||'').trim();
+    const col8 = (vals[8]||'').trim();
     if (col0 && !col2 && col0 !== 'cidade' && !col0.includes('ALOJAMENTO')) {
       currentHotel = { cidade: col0, noites: col1, opcoes: [], searchLink: col7 || '' };
       hotels.push(currentHotel);
     } else if (currentHotel && col2 && col2 !== 'nome_hotel') {
       currentHotel.opcoes.push({
         nome: col2, det: col3, preco: col4||'—', link: col5,
-        votos: col6 ? col6.split(',').map(v=>v.trim()).filter(Boolean) : []
+        votos: col6 ? col6.split(',').map(v=>v.trim()).filter(Boolean) : [],
+        endereco: col8 || ''
       });
     }
   });
@@ -871,9 +837,9 @@ async function init() {
     if (window._appsScriptData && window._appsScriptData.checks) {
       window._savedChecks = window._appsScriptData.checks;
     }
-    renderWelcome();
-    showScreen('welcome');
-    console.log("✅ App iniciada — utilizadores:", participants.map(p=>p.nome));
+    renderAll();
+    showScreen('main');
+    console.log("✅ App iniciada — modo viagem (sem login)");
   } catch(e) {
     document.getElementById("err-detail").textContent = e.message + " | Stack: " + e.stack;
     showScreen('error');
@@ -955,57 +921,20 @@ function loadFallbackData() {
   document.getElementById('hdr-sub').textContent = 'Percurso B · 29 ago – 12 set · 4 pessoas';
   document.getElementById('w-sub').textContent = '29 ago → 12 set · 4 participantes';
   updateCountdown('2026-08-29');
-  renderWelcome();
-  showScreen('welcome');
+  renderAll();
+  showScreen('main');
 }
 
 // ═══ SCREEN MANAGEMENT ═══
 function showScreen(name) {
-  ['loading','welcome','error','main'].forEach(s => {
+  ['loading','error','main'].forEach(s => {
     const el = document.getElementById('scr-'+s);
     if (el) el.classList.toggle('active', s === name);
   });
 }
 
-// ═══ WELCOME ═══
-function renderWelcome() {
-  const list = document.getElementById('pax-list');
-  list.innerHTML = participants.map((p, i) => `
-    <div class="pax-opt" onclick="selectPax(${i})" id="pax-${i}">
-      <div class="pax-icon">${p.icon}</div>
-      <div class="pax-info">
-        <div class="pax-name">${p.nome}</div>
-        <div class="pax-role">${p.tipo === 'criança' ? 'Criança' : 'Adulto'}</div>
-      </div>
-      <span class="pax-status ${p.pago ? 'ps-ok' : 'ps-pend'}">${p.pago ? 'Pago' : 'Pendente'}</span>
-    </div>`).join('');
-}
-
-let selPaxIdx = -1;
-function selectPax(i) {
-  selPaxIdx = i;
-  document.querySelectorAll('.pax-opt').forEach((el, j) => el.classList.toggle('sel', j === i));
-  const btn = document.getElementById('w-enter');
-  btn.disabled = false;
-  btn.textContent = `Entrar como ${participants[i].nome} →`;
-}
-
-function enterApp() {
-  if (selPaxIdx < 0) return;
-  currentUser = participants[selPaxIdx];
-  document.getElementById('hdr-icon').textContent = currentUser.icon;
-  document.getElementById('hdr-name').textContent = currentUser.nome;
-  showScreen('main');
-  renderAll();
-}
-
-function switchUser() {
-  selPaxIdx = -1;
-  showScreen('welcome');
-  document.querySelectorAll('.pax-opt').forEach(el => el.classList.remove('sel'));
-  document.getElementById('w-enter').disabled = true;
-  document.getElementById('w-enter').textContent = 'Seleciona o teu perfil';
-}
+// ═══ UTILIZADOR GENÉRICO (app partilhada, sem login) ═══
+currentUser = { nome: 'Família', icon: 'F' };
 
 // ═══ SECTION NAV ═══
 function showSec(id, btn) {
@@ -1109,6 +1038,19 @@ function renderSyncBars() {
 }
 
 // ═══ ITINERARY ═══
+function amapCity(d) {
+  return (d.hanzi || '').split('→')[0].split('/')[0].trim();
+}
+function amapKeyword(str) {
+  // Remove trailing "HH:MM" and anything after it (e.g. "Pequim Oeste 08:30" → "Pequim Oeste")
+  return (str || '').replace(/\s*\d{1,2}:\d{2}.*$/, '').trim();
+}
+function amapLink(name, city) {
+  const kw = encodeURIComponent(amapKeyword(name));
+  const c = city ? '&city=' + encodeURIComponent(city) : '';
+  return `https://uri.amap.com/search?keyword=${kw}${c}`;
+}
+
 function renderItin() {
   document.getElementById('ap-day').innerHTML = days.map((d, i) =>
     `<option value="${i}">Dia ${d.dia} · ${d.local}</option>`).join('');
@@ -1127,24 +1069,40 @@ function renderItin() {
       <div class="dbody" id="db-${i}">
         ${d.travel ? `
         <div class="mtb">
-          <div class="mtbl">${d.travel.tipo}</div>
-          <div class="mtbm">${d.travel.nome}</div>
-          <div class="mtbm">${d.travel.p1}</div>
-          <div class="mtbm">${d.travel.p2}</div>
+          <div class="mtbl">${d.travel.tipo}${d.travel.nome ? ' · ' + d.travel.nome : ''}</div>
+          <div class="station-crit">
+            <span class="station-warn">⚠ ESTAÇÃO — NÃO FALHAR</span>
+            <div class="station-row">
+              <span class="station-name">${amapKeyword(d.travel.p1)}</span>
+              <a class="station-amap" href="${amapLink(d.travel.p1, amapCity(d))}" target="_blank">📍 Amap</a>
+            </div>
+            <div class="station-time">${(d.travel.p1.match(/\d{1,2}:\d{2}/)||[''])[0]}</div>
+          </div>
+          <div class="station-arrow">↓</div>
+          <div class="station-crit">
+            <span class="station-warn">⚠ ESTAÇÃO DE CHEGADA</span>
+            <div class="station-row">
+              <span class="station-name">${amapKeyword(d.travel.p2)}</span>
+              <a class="station-amap" href="${amapLink(d.travel.p2, '')}" target="_blank">📍 Amap</a>
+            </div>
+            <div class="station-time">${(d.travel.p2.match(/\d{1,2}:\d{2}.*/)||[''])[0]}</div>
+          </div>
           <div class="mtbd">${d.travel.dur}${d.travel.custo?' · '+d.travel.custo:''}</div>
           <div class="mtblinks">
-            ${d.travel.link ? `<a class="mtbl-a mtbl-book" href="${d.travel.link}" target="_blank">Reservar</a>` : ''}
+            ${d.travel.link ? `<a class="mtbl-a mtbl-book" href="${d.travel.link}" target="_blank">Bilhete</a>` : ''}
             <a class="mtbl-a mtbl-didi" href="https://www.didiglobal.com" target="_blank">Didi</a>
-            <a class="mtbl-a mtbl-amap" href="https://uri.amap.com" target="_blank">Amap</a>
           </div>
         </div>` : ''}
-        ${d.transfer ? `<div class="tr-strip"><span class="tr-badge">Transfer</span><span style="font-size:11px;color:var(--gray)">${d.transfer.de} → ${d.transfer.para}</span>${d.transfer.didi ? `<a href="https://www.didiglobal.com" target="_blank" style="font-size:10px;padding:2px 8px;border-radius:20px;text-decoration:none;background:#FF6600;color:#fff;font-weight:500">Didi</a>` : ''}</div>` : ''}
+        ${d.transfer ? `<div class="tr-strip"><span class="tr-badge">Transfer</span><span style="font-size:11px;color:var(--gray)">${d.transfer.de} → ${d.transfer.para}</span><a class="station-amap" style="margin-left:4px" href="${amapLink(d.transfer.de, amapCity(d))}" target="_blank">📍 Amap</a>${d.transfer.didi ? `<a href="https://www.didiglobal.com" target="_blank" style="font-size:10px;padding:2px 8px;border-radius:20px;text-decoration:none;background:#FF6600;color:#fff;font-weight:500">Didi</a>` : ''}</div>` : ''}
         ${d.atividades.map((a, ai) => a.tipo === 'ativ' ? `
         <div class="arow">
           <input type="checkbox" class="acb" ${getCheck(i,ai)?'checked':''} onchange="saveCheckRemote(${i},${ai},this.checked)">
           <div>
             <div class="atext">${a.txt}</div>
-            ${a.link ? `<a class="alink" href="${a.link}" target="_blank">Site oficial →</a>` : ''}
+            <div class="arow-links">
+              ${a.link ? `<a class="alink" href="${a.link}" target="_blank">Site oficial →</a>` : ''}
+              <a class="alink amap-mini" href="${amapLink(a.txt, amapCity(d))}" target="_blank">📍 Amap</a>
+            </div>
             ${a.cn ? `<button class="acnbtn" onclick='showCN(${JSON.stringify(a.cn)})'>中 Mostrar em chinês</button>` : ''}
           </div>
         </div>` : `
@@ -1193,54 +1151,26 @@ function closeCN() { document.getElementById('cn-overlay').classList.remove('ope
 function renderHotels() {
   document.getElementById('hotels-list').innerHTML = hotels.map((h, ci) => `
     <div class="hcard">
-      <div class="hchdr">${h.cidade} · ${h.noites}<button class="card-act" onclick="toggleAddHotel(${ci})">+ Opção</button></div>
-      ${h.opcoes.map((o, oi) => `
-        <div class="hopt">
-          <input type="radio" class="hrad" name="h${ci}" ${oi===0?'checked':''}>
-          <div class="hinfo">
-            <div class="hname">${o.nome}</div>
+      <div class="hchdr">${h.cidade} · ${h.noites}</div>
+      ${h.opcoes.map((o) => `
+        <div class="hopt" style="cursor:default">
+          <div class="hinfo" style="width:100%">
+            <div class="hname">✓ ${o.nome}</div>
             <div class="hdet">${o.det}</div>
-            ${o.link ? `<a class="hbkl" href="${o.link}" target="_blank">Ver no Booking.com →</a>` : `<span style="font-size:11px;color:var(--gray)">A confirmar</span>`}
-            <div class="vrow">
-              <button class="vbtn ${o.votos.includes(currentUser?.icon)?'voted':''}" onclick="vote(${ci},${oi})">${o.votos.includes(currentUser?.icon)?'✓ Votado':'Votar'}</button>
-              <span class="vicons">${o.votos.length ? o.votos.join(' ') : '—'}</span>
-            </div>
+            ${o.link ? `<a class="hbkl" href="${o.link}" target="_blank">Ver reserva no Booking.com →</a>` : ''}
+            ${o.endereco ? `
+            <div class="hotel-addr-crit">
+              <span class="hotel-addr-warn">⚠ Morada do hotel</span>
+              <div class="hotel-addr-text">${o.endereco}</div>
+              <div class="hotel-addr-links">
+                <a class="hotel-addr-amap" href="${amapLink(o.nome, h.cidade.split(' ')[0])}" target="_blank">📍 Abrir no Amap</a>
+                <a class="hotel-addr-didi" href="https://www.didiglobal.com" target="_blank">🚕 Didi</a>
+              </div>
+            </div>` : ''}
           </div>
-          <div class="hpr"><div class="hprice">${o.preco}</div><div class="hpsub">família</div></div>
+          <div class="hpr"><div class="hprice">${o.preco}</div></div>
         </div>`).join('')}
-      <div class="hadd-form" id="hadd-${ci}">
-        <input class="hadd-inp" id="hn-${ci}" placeholder="Nome do hotel ou opção">
-        <div class="hadd-row">
-          <input class="hadd-inp" id="hpr-${ci}" placeholder="Preço total €" style="flex:1">
-          <input class="hadd-inp" id="hl-${ci}" placeholder="Link Booking" style="flex:2">
-        </div>
-        <div class="hadd-row">
-          <button class="hadd-btn p" onclick="saveHotel(${ci})">Guardar</button>
-          <button class="hadd-btn s" onclick="toggleAddHotel(${ci})">Cancelar</button>
-        </div>
-      </div>
-      ${h.searchLink ? `<a class="hsearchl" href="${h.searchLink}" target="_blank">🔍 Pesquisar hotéis em ${h.cidade.split(' ')[0]} no Booking.com →</a>` : ''}
     </div>`).join('');
-}
-
-function toggleAddHotel(ci) { document.getElementById('hadd-'+ci).classList.toggle('open'); }
-function saveHotel(ci) {
-  const nome = document.getElementById('hn-'+ci).value || 'Nova opção';
-  const preco = document.getElementById('hpr-'+ci).value;
-  const link = document.getElementById('hl-'+ci).value || '';
-  hotels[ci].opcoes.push({ nome, det: 'Nova opção', preco: preco ? preco+'€' : '—', link, votos: [] });
-  renderHotels();
-  apiPost({ action: 'add_hotel', cidade: hotels[ci].cidade, nome, preco, link });
-}
-function vote(ci, oi) {
-  if (!currentUser) return;
-  const o = hotels[ci].opcoes[oi];
-  const idx = o.votos.indexOf(currentUser.icon);
-  const adding = idx === -1;
-  if (adding) o.votos.push(currentUser.icon); else o.votos.splice(idx, 1);
-  renderHotels();
-  // Save to Apps Script
-  apiPost({ action: 'vote', cidade_idx: ci, hotel_idx: oi, user_icon: currentUser.icon, add: adding });
 }
 
 

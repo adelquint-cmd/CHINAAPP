@@ -845,57 +845,65 @@ async function init() {
 }
 
 function loadFallbackData() {
-  // Dados de demonstração — substituídos pelo Google Sheet em produção
+  // Dados REAIS confirmados — usados como rede de segurança caso o Google Sheet
+  // fique inacessível (ex: bloqueio de rede na China sem VPN). Atualizado 27 ago 2026.
   participants = [
-    {nome:"João M.", tipo:"adulto", icon:"🧭", pago:true},
-    {nome:"Ana M.",  tipo:"adulto", icon:"📸", pago:false},
-    {nome:"Teen 1",  tipo:"criança",icon:"🐼", pago:true},
-    {nome:"Teen 2",  tipo:"criança",icon:"🌏", pago:false}
+    {nome:"M", tipo:"adulto", icon:"M", pago:true},
+    {nome:"L", tipo:"adulto", icon:"L", pago:true},
+    {nome:"J", tipo:"adulto", icon:"J", pago:false},
+    {nome:"B", tipo:"adulto", icon:"B", pago:false},
+    {nome:"T", tipo:"criança",icon:"T", pago:true},
+    {nome:"I", tipo:"criança",icon:"I", pago:true},
+    {nome:"D", tipo:"criança",icon:"D", pago:false},
+    {nome:"S", tipo:"criança",icon:"S", pago:false}
   ];
   days = [
-    {dia:1,data:"29 ago, Sáb",local:"Chegada Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Chegada PEK — imigração, transfer, check-in",tipo:"info"},{txt:"Jantar leve e descanso",tipo:"info"}],transfer:{de:"PEK Airport",para:"Hotel central",didi:true}},
-    {dia:2,data:"30 ago, Dom",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Cidade Proibida + Praça Tiananmen",tipo:"ativ",link:"https://www.dpm.org.cn",cn:{big:"故宫",pinyin:"Gùgōng",pt:"Cidade Proibida",addr:"4 Jingshan Front St\n东城区景山前街4号"}},{txt:"Hutongs de rickshaw + street food",tipo:"ativ"},{txt:"Metro / táxi",tipo:"info"}]},
-    {dia:3,data:"31 ago, Seg",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Templo do Céu",tipo:"ativ",link:"https://www.tiantan.org.cn",cn:{big:"天坛",pinyin:"Tiāntán",pt:"Templo do Céu",addr:"1 Tiantan East Rd\n东城区天坛东路1号"}},{txt:"Wangfujing — street food + shopping",tipo:"ativ"},{txt:"Metro",tipo:"info"}]},
-    {dia:4,data:"1 set, Ter",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Universal Studios Beijing — full day",tipo:"ativ",link:"https://www.universalbeijingresort.com",cn:{big:"环球影城",pinyin:"Huánqiú Yǐngchéng",pt:"Universal Studios",addr:"东坝镇东坝村，朝阳区"}},{txt:"Metro direto (~35 min)",tipo:"info"}]},
-    {dia:5,data:"2 set, Qua",local:"Pequim → Xi'an",hanzi:"北京→西安",isTravel:true,atividades:[{txt:"Grande Muralha — Mutianyu + teleférico + tobogã",tipo:"ativ",link:"https://www.mutianyugreatwall.com",cn:{big:"长城",pinyin:"Chángchéng",pt:"Grande Muralha",addr:"Huairou District\n北京市怀柔区慕田峪"}},{txt:"Transfer estação → hotel",tipo:"info"}]},
-    {dia:6,data:"3 set, Qui",local:"Xi'an",hanzi:"西安",isTravel:false,atividades:[{txt:"Exército de Terracota",tipo:"ativ",link:"https://www.bmy.com.cn",cn:{big:"兵马俑",pinyin:"Bīngmǎyǒng",pt:"Exército de Terracota",addr:"Lintong District\n西安市临潼区"}},{txt:"Muralha antiga de bicicleta",tipo:"ativ"},{txt:"Bairro Muçulmano",tipo:"ativ",cn:{big:"回民街",pinyin:"Huímín Jiē",pt:"Bairro Muçulmano",addr:"Lianhu District\n西安市莲湖区"}},{txt:"Táxi / tour",tipo:"info"}]},
-    {dia:7,data:"4 set, Sex",local:"Xi'an → Chengdu",hanzi:"西安→成都",isTravel:true,atividades:[{txt:"Jinli Ancient Street",tipo:"ativ",cn:{big:"锦里",pinyin:"Jǐn Lǐ",pt:"Jinli Ancient Street",addr:"Wuhou District\n成都市武侯区"}},{txt:"Transfer estação → hotel",tipo:"info"}]},
-    {dia:8,data:"5 set, Sáb",local:"Chengdu",hanzi:"成都",isTravel:false,atividades:[{txt:"Panda Base — chegar antes das 8h",tipo:"ativ",link:"https://www.panda.org.cn",cn:{big:"大熊猫",pinyin:"Dà Xióngmāo",pt:"Panda Base",addr:"1375 Panda Ave\n成都市成华区熊猫大道1375号"}},{txt:"Tarde: hotpot típico",tipo:"ativ"},{txt:"Táxi / Didi",tipo:"info"}]},
-    {dia:9,data:"6 set, Dom",local:"Chengdu → Zhangjiajie",hanzi:"成都→张家界",isTravel:true,atividades:[{txt:"Trilha leve no parque Wulingyuan",tipo:"ativ"},{txt:"Transfer estação → hotel",tipo:"info"}]},
-    {dia:10,data:"7 set, Seg",local:"Zhangjiajie",hanzi:"张家界",isTravel:false,atividades:[{txt:"Bailong Elevator (326m)",tipo:"ativ",cn:{big:"百龙天梯",pinyin:"Bǎilóng Tiāntī",pt:"Elevador Bailong",addr:"Wulingyuan District\n张家界市武陵源区"}},{txt:"Ponte de vidro + teleférico",tipo:"ativ"},{txt:"Autocarro interno do parque",tipo:"info"}]},
-    {dia:11,data:"8 set, Ter",local:"Zhangjiajie → Xangai",hanzi:"张家界→上海",isTravel:true,atividades:[{txt:"The Bund ao pôr-do-sol",tipo:"ativ",cn:{big:"外滩",pinyin:"Wàitān",pt:"The Bund",addr:"Zhongshan East 1st Rd\n上海市黄浦区中山东一路"}},{txt:"Transfer estação → hotel",tipo:"info"}]},
-    {dia:12,data:"9 set, Qua",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Shanghai Disneyland — full day",tipo:"ativ",link:"https://www.shanghaidisneyresort.com",cn:{big:"迪士尼",pinyin:"Dí shì ní",pt:"Shanghai Disneyland",addr:"310 Shendi West Rd\n上海市浦东新区"}},{txt:"Metro linha 11 direto",tipo:"info"}]},
-    {dia:13,data:"10 set, Qui",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Yu Garden + Tianzifang",tipo:"ativ",cn:{big:"豫园",pinyin:"Yùyuán",pt:"Yu Garden",addr:"218 Anren St\n上海市黄浦区"}},{txt:"Oriental Pearl Tower",tipo:"ativ",link:"https://www.orientalpearltower.com",cn:{big:"东方明珠",pinyin:"Dōngfāng Míngzhū",pt:"Oriental Pearl Tower",addr:"1 Century Ave\n上海市浦东新区"}},{txt:"Maglev Train (430 km/h!)",tipo:"ativ"},{txt:"Metro",tipo:"info"}]},
-    {dia:14,data:"11 set, Sex",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Zhujiajiao water town",tipo:"ativ",cn:{big:"朱家角",pinyin:"Zhūjiājiǎo",pt:"Zhujiajiao",addr:"Qingpu District\n上海市青浦区"}},{txt:"Dia livre / shopping",tipo:"ativ"},{txt:"Metro ou tour",tipo:"info"}]},
-    {dia:15,data:"12 set, Sáb",local:"Partida Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Manhã livre",tipo:"info"},{txt:"Voo PVG → Lisboa · EK305 07:20",tipo:"info"}],transfer:{de:"Hotel Xangai",para:"Shanghai Pudong (PVG)",didi:true}}
+    {dia:1,data:"29 ago, Sáb",local:"Chegada Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Chegada PEK 11:45 (voo MUC-PEK) — imigração, transfer, check-in",tipo:"info"},{txt:"Jantar leve e descanso",tipo:"info"}],transfer:{de:"Beijing Capital Airport",para:"Peace Hotel Beijing",didi:true}},
+    {dia:2,data:"30 ago, Dom",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Cidade Proibida",tipo:"ativ",link:"https://www.dpm.org.cn",cn:{big:"故宫",pinyin:"Gùgōng",pt:"Cidade Proibida",addr:"4 Jingshan Front St\n东城区景山前街4号"}},{txt:"Templo do Céu",tipo:"ativ",cn:{big:"天坛公园",pinyin:"Tiāntán Gōngyuán",pt:"Templo do Céu",addr:"1 Tiantan East Rd\n东城区天坛东路1号"}},{txt:"Hutongs — Nanluoguxiang",tipo:"ativ",cn:{big:"南锣鼓巷",pinyin:"Nánluógǔxiàng",pt:"Hutongs",addr:"Dongcheng District\n东城区南锣鼓巷"}},{txt:"Metro / táxi",tipo:"info"}]},
+    {dia:3,data:"31 ago, Seg",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Universal Studios Beijing — dia completo",tipo:"ativ",link:"https://www.universalbeijingresort.com",cn:{big:"北京环球度假区",pinyin:"Běijīng Huánqiú Dùjiàqū",pt:"Universal Studios",addr:"东坝镇东坝村，朝阳区"}},{txt:"Metro direto (~35 min)",tipo:"info"}]},
+    {dia:4,data:"1 set, Ter",local:"Pequim",hanzi:"北京",isTravel:false,atividades:[{txt:"Grande Muralha — secção Mutianyu",tipo:"ativ",link:"https://www.mutianyugreatwall.com",cn:{big:"慕田峪长城",pinyin:"Mùtiányù Chángchéng",pt:"Grande Muralha Mutianyu",addr:"Huairou District\n北京市怀柔区慕田峪"}},{txt:"Didi recomendado (~1-1.5h cada via, saída 6-6:30h para evitar multidões)",tipo:"info"}]},
+    {dia:5,data:"2 set, Qua",local:"Pequim → Xi'an",hanzi:"北京→西安",isTravel:true,atividades:[],travel:{tipo:"Comboio AV",nome:"G969",p1:"Pequim Oeste 09:10",p2:"Xi'an Norte 15:07",dur:"5h57m",custo:"",link:"https://www.trip.com/trains/"}},
+    {dia:6,data:"3 set, Qui",local:"Xi'an → Chengdu",hanzi:"西安→成都",isTravel:true,atividades:[{txt:"Exército de Terracota (manhã)",tipo:"ativ",link:"https://www.bmy.com.cn",cn:{big:"秦始皇兵马俑博物馆",pinyin:"Qínshǐhuáng Bīngmǎyǒng Bówùguǎn",pt:"Exército de Terracota",addr:"Lintong District\n西安市临潼区"}}],travel:{tipo:"Comboio AV",nome:"G3353",p1:"Xi'an Norte 15:29",p2:"Chengdu Leste",dur:"~3h05m",custo:"",link:"https://www.trip.com/trains/"}},
+    {dia:7,data:"4 set, Sex",local:"Chengdu",hanzi:"成都",isTravel:false,atividades:[{txt:"Panda Base (manhã) — chegar antes das 8h",tipo:"ativ",link:"https://www.panda.org.cn",cn:{big:"成都大熊猫繁育研究基地",pinyin:"Dà Xióngmāo Jīdì",pt:"Panda Base",addr:"1375 Panda Ave\n成都市成华区熊猫大道1375号"}},{txt:"Chunxi Road / Taikoo Li (tarde)",tipo:"ativ",cn:{big:"成都远洋太古里",pinyin:"Tàigǔlǐ",pt:"Chunxi Road / Taikoo Li",addr:"Jinjiang District\n成都市锦江区"}},{txt:"Táxi / Didi",tipo:"info"}]},
+    {dia:8,data:"5 set, Sáb",local:"Chengdu → Chongqing",hanzi:"成都→重庆",isTravel:true,atividades:[{txt:"Espetáculo de drones 20:30 — Chaotianmen / Nanbin Road",tipo:"ativ",cn:{big:"朝天门",pinyin:"Cháotiānmén",pt:"Chaotianmen",addr:"Yuzhong District\n重庆市渝中区朝天门"}}],travel:{tipo:"Comboio AV",nome:"D368",p1:"Chengdu Leste 10:50",p2:"Chongqing Norte",dur:"~4h30m",custo:"",link:"https://www.trip.com/trains/"}},
+    {dia:9,data:"6 set, Dom",local:"Chongqing → Zhangjiajie",hanzi:"重庆→张家界",isTravel:true,atividades:[],transfer:{de:"Hotel Chongqing (Jiefangbei)",para:"Chongqing Leste (重庆东站)",didi:true},travel:{tipo:"Comboio AV",nome:"G3375",p1:"Chongqing Leste 12:14",p2:"Zhangjiajie Oeste",dur:"~2h02m",custo:"",link:"https://www.trip.com/trains/"}},
+    {dia:10,data:"7 set, Seg",local:"Zhangjiajie",hanzi:"张家界",isTravel:false,atividades:[{txt:"Bailong Elevator",tipo:"ativ",cn:{big:"百龙天梯",pinyin:"Bǎilóng Tiāntī",pt:"Elevador Bailong",addr:"Wulingyuan District\n张家界市武陵源区"}},{txt:"Ponte de vidro (Grand Canyon)",tipo:"ativ",cn:{big:"张家界大峡谷玻璃桥",pinyin:"Bōli Qiáo",pt:"Ponte de Vidro",addr:"Cizhiya, Cili County\n张家界市慈利县"}},{txt:"Autocarro interno do parque",tipo:"info"}]},
+    {dia:11,data:"8 set, Ter",local:"Zhangjiajie → Xangai",hanzi:"张家界→上海",isTravel:true,atividades:[{txt:"Manhã livre em Zhangjiajie",tipo:"info"},{txt:"Transfer para a estação a meio da tarde",tipo:"info"}],travel:{tipo:"Comboio AV (G-train, diurno)",nome:"G221",p1:"Zhangjiajie Oeste 14:39",p2:"Xangai Hongqiao 21:57",dur:"7h18m",custo:"",link:"https://www.trip.com/trains/"}},
+    {dia:12,data:"9 set, Qua",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Yu Garden",tipo:"ativ",cn:{big:"豫园",pinyin:"Yùyuán",pt:"Yu Garden",addr:"218 Anren St\n上海市黄浦区"}},{txt:"Nanjing Road",tipo:"ativ",cn:{big:"南京路步行街",pinyin:"Nánjīnglù",pt:"Nanjing Road",addr:"Huangpu District\n上海市黄浦区"}},{txt:"The Bund",tipo:"ativ",cn:{big:"外滩",pinyin:"Wàitān",pt:"The Bund",addr:"Zhongshan East 1st Rd\n上海市黄浦区中山东一路"}},{txt:"Metro",tipo:"info"}]},
+    {dia:13,data:"10 set, Qui",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Shanghai Disneyland — dia completo",tipo:"ativ",link:"https://www.shanghaidisneyresort.com",cn:{big:"上海迪士尼度假区",pinyin:"Díshìní Dùjiàqū",pt:"Shanghai Disneyland",addr:"310 Shendi West Rd\n上海市浦东新区"}},{txt:"Metro linha 11 direto",tipo:"info"}]},
+    {dia:14,data:"11 set, Sex",local:"Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Pudong — Oriental Pearl Tower",tipo:"ativ",link:"https://www.orientalpearltower.com",cn:{big:"东方明珠塔",pinyin:"Dōngfāng Míngzhū Tǎ",pt:"Oriental Pearl Tower",addr:"1 Century Ave\n上海市浦东新区"}},{txt:"Shanghai Tower",tipo:"ativ",cn:{big:"上海中心大厦",pinyin:"Shànghǎi Zhōngxīn",pt:"Shanghai Tower",addr:"Lujiazui\n上海市浦东新区陆家嘴"}},{txt:"Science Museum",tipo:"ativ",cn:{big:"上海科技馆",pinyin:"Kējìguǎn",pt:"Science Museum",addr:"2000 Century Ave\n上海市浦东新区世纪大道2000号"}},{txt:"Maglev (opcional)",tipo:"ativ"},{txt:"Metro",tipo:"info"}]},
+    {dia:15,data:"12 set, Sáb",local:"Partida Xangai",hanzi:"上海",isTravel:false,atividades:[{txt:"Manhã livre",tipo:"info"},{txt:"Voo PVG → Viena 09:30 · ligações via Frankfurt até Lisboa",tipo:"info"}],transfer:{de:"Atour Hotel Nanjing East Road",para:"Shanghai Pudong (PVG)",didi:true}}
   ];
   hotels = [
-    {cidade:"Pequim 北京",noites:"4 noites · 29 ago–2 set",opcoes:[{nome:"Opção A",det:"Hotel central · APA",preco:"450€",link:"https://www.booking.com/Share-rlzp5b",votos:[]},{nome:"Opção B",det:"Hotel central · APA",preco:"449€",link:"https://www.booking.com/Share-KrNHJvy",votos:["🧭"]},{nome:"Opção C",det:"Hotel central · Só aloj.",preco:"416€",link:"https://www.booking.com/Share-OWsH0Yv",votos:[]}]},
-    {cidade:"Xi'an 西安",noites:"2 noites · 2–4 set",opcoes:[{nome:"Opção A",det:"Dentro das muralhas · APA",preco:"126€",link:"https://www.booking.com/Share-V2kOgLx",votos:["🧭","📸"]},{nome:"Opção B",det:"Dentro das muralhas · APA",preco:"124€",link:"https://www.booking.com/Share-4N35rS",votos:[]}]},
-    {cidade:"Chengdu 成都",noites:"2 noites · 4–6 set",opcoes:[{nome:"Niccolo Chengdu",det:"Hotel 5* central",preco:"~260€",link:"",votos:[]}]},
-    {cidade:"Zhangjiajie 张家界",noites:"2 noites · 6–8 set",opcoes:[{nome:"Opção A",det:"Hotel Wulingyuan · APA",preco:"97€",link:"https://www.booking.com/Share-je9zvR",votos:[]}]},
-    {cidade:"Xangai 上海",noites:"4 noites · 8–12 set",opcoes:[{nome:"Opção A",det:"Hotel central · APA",preco:"556€",link:"https://www.booking.com/Share-JDO0i5",votos:["🧭"]},{nome:"Opção B",det:"Hotel central · APA",preco:"530€",link:"https://www.booking.com/Share-xLEfqzu",votos:[]}]}
+    {cidade:"Pequim 北京",noites:"4 noites · 29 ago–2 set",opcoes:[{nome:"Peace Hotel Beijing",det:"Wangfujing · Reservado",preco:"—",link:"",votos:[],endereco:"3 Jinyu Hutong, Wangfujing, Dongcheng, 100006 Pequim"}]},
+    {cidade:"Xi'an 西安",noites:"2 noites · 2–4 set",opcoes:[{nome:"Jin Jiang West Capital International Hotel",det:"Bell Tower · Reservado",preco:"—",link:"",votos:[],endereco:"No.135 West Street, Lianhu District, 710002 Xi'an"}]},
+    {cidade:"Chengdu 成都",noites:"1 noite · 4–5 set",opcoes:[{nome:"Echeng Hotel Chunxi Road Taikoo Li",det:"Jinjiang District · Reservado",preco:"—",link:"",votos:[],endereco:"Jinjiang District, zona Chunxi Road / Taikoo Li, Chengdu"}]},
+    {cidade:"Chongqing 重庆",noites:"1 noite · 5–6 set",opcoes:[{nome:"Pagoda Hotel Jiefangbei Hongya Cave",det:"Yuzhong/Jiefangbei · Reservado",preco:"—",link:"",votos:[],endereco:"Jiefangbei, Yuzhong District, Chongqing"}]},
+    {cidade:"Zhangjiajie 张家界",noites:"2 noites · 6–8 set",opcoes:[{nome:"Paradise Hotel (恬雅智诚酒店)",det:"Wulingyuan East Gate · Reservado",preco:"—",link:"",votos:[],endereco:"No.178 Weiyang Road, Wujiayu, Jundiping Street, Wulingyuan District"}]},
+    {cidade:"Xangai 上海",noites:"4 noites · 8–12 set",opcoes:[{nome:"Atour Hotel Nanjing East Road The Bund",det:"Huangpu · Reservado",preco:"—",link:"",votos:[],endereco:"No. 105 Fuzhou Road, Huangpu District, Xangai"}]}
   ];
   mapStops = [
-    {cidade:"Lisboa",sub:"Partida · 28 ago 21:25",filled:true,travel:{tipo:"Voo ida · Emirates",nome:"EK194 + EK308",p1:"LIS 21:25 → DXB 08:05 (+1)",p2:"DXB 10:40 → PEK 22:20",dur:"17h55 · 1 escala · 2h35",custo:"~1000€/pax",link:"https://www.emirates.com",transfer:"PEK Airport → Hotel (Didi)"}},
-    {cidade:"Pequim 北京",sub:"29 ago – 2 set · 4 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G323",p1:"Beijing South 15:00",p2:"Xi'an North 19:12",dur:"4h12m · ~85€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Xi'an North → Hotel (Didi)"}},
-    {cidade:"Xi'an 西安",sub:"2 – 4 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G321",p1:"Xi'an North 07:03",p2:"Chengdu East 11:06",dur:"3h33m · ~35€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Chengdu East → Hotel (Didi)"}},
-    {cidade:"Chengdu 成都",sub:"4 – 6 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G2445",p1:"Chengdu East 08:00",p2:"Zhangjiajie West 11:58",dur:"3h58m · ~61€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Zhangjiajie West → Hotel (Didi)"}},
-    {cidade:"Zhangjiajie 张家界",sub:"6 – 8 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G1367",p1:"Zhangjiajie West 07:28",p2:"Shanghai Hongqiao 16:25",dur:"8h57m · ~115€/pax",custo:"",link:"https://www.trip.com/trains/",transfer:"Shanghai Hongqiao → Hotel (Didi)"}},
-    {cidade:"Xangai 上海",sub:"8 – 12 set · 4 noites",filled:true,travel:{tipo:"Voo regresso · Emirates",nome:"EK305 + EK193",p1:"PVG 07:20 → DXB 12:00",p2:"DXB 14:25 → LIS 19:40",dur:"19h20 · 1 escala · 2h25",custo:"~1000€/pax",link:"https://www.emirates.com",transfer:"Hotel → PVG (Didi)"}},
-    {cidade:"Lisboa",sub:"Chegada · 12 set 19:40",filled:false,travel:null}
+    {cidade:"Lisboa",sub:"Partida · 28 ago",filled:true,travel:{tipo:"Voo ida",nome:"LIS-MUC + MUC-PEK",p1:"Lisboa (LIS) 14:30 → Munique (MUC) 18:40",p2:"Munique (MUC) 19:45 → Pequim (PEK) 11:45 (+1)",dur:"28 ago → 29 ago",custo:"",link:"",transfer:"PEK Airport → Peace Hotel Beijing (Didi)"}},
+    {cidade:"Pequim 北京",sub:"29 ago – 2 set · 4 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G969",p1:"Pequim Oeste 09:10",p2:"Xi'an Norte 15:07",dur:"5h57m",custo:"",link:"https://www.trip.com/trains/",transfer:"Xi'an Norte → Hotel (Didi)"}},
+    {cidade:"Xi'an 西安",sub:"2 – 3 set · 2 noites",filled:true,travel:{tipo:"Comboio AV",nome:"G3353",p1:"Xi'an Norte 15:29",p2:"Chengdu Leste",dur:"~3h05m",custo:"",link:"https://www.trip.com/trains/",transfer:"Chengdu Leste → Hotel (Didi)"}},
+    {cidade:"Chengdu 成都",sub:"3 – 5 set · 1 noite",filled:true,travel:{tipo:"Comboio AV",nome:"D368",p1:"Chengdu Leste 10:50",p2:"Chongqing Norte",dur:"~4h30m",custo:"",link:"https://www.trip.com/trains/",transfer:"Chongqing Norte → Hotel (Didi)"}},
+    {cidade:"Chongqing 重庆",sub:"5 – 6 set · 1 noite",filled:true,travel:{tipo:"Comboio AV ⚠️ estação diferente",nome:"G3375",p1:"Chongqing Leste 12:14",p2:"Zhangjiajie Oeste",dur:"~2h02m",custo:"",link:"https://www.trip.com/trains/",transfer:"Hotel → Chongqing Leste (Didi, ~40min)"}},
+    {cidade:"Zhangjiajie 张家界",sub:"6 – 8 set · 2 noites",filled:true,travel:{tipo:"Comboio AV (G-train diurno)",nome:"G221",p1:"Zhangjiajie Oeste 14:39",p2:"Xangai Hongqiao 21:57",dur:"7h18m",custo:"",link:"https://www.trip.com/trains/",transfer:"Xangai Hongqiao → Hotel (Didi)"}},
+    {cidade:"Xangai 上海",sub:"8 – 12 set · 4 noites",filled:true,travel:{tipo:"Voo regresso",nome:"PVG-VIE + VIE-FRA + FRA-LIS",p1:"Xangai Pudong (PVG) 09:30 → Viena (VIE) 15:55",p2:"Viena (VIE) 18:30 → Frankfurt (FRA) 20:00 → Lisboa (LIS) 23:30",dur:"12 set",custo:"",link:"",transfer:"Hotel → PVG (Didi)"}},
+    {cidade:"Lisboa",sub:"Chegada · 12 set 23:30",filled:false,travel:null}
   ];
   costs = [
-    {nome:"Voos Emirates LIS↔PEK/PVG",pp_adult:1000,pp_child:800,pago:true,real:false},
+    {nome:"Voos LIS↔PEK/PVG (via MUC/VIE/FRA)",pp_adult:1000,pp_child:800,pago:true,real:false},
     {nome:"Universal Studios Beijing",pp_adult:70,pp_child:70,pago:false,real:false},
     {nome:"Grande Muralha Mutianyu",pp_adult:33,pp_child:33,pago:false,real:false},
-    {nome:"Comboio G323 Pequim→Xi'an",pp_adult:85,pp_child:43,pago:false,real:false},
+    {nome:"Comboio G969 Pequim→Xi'an",pp_adult:85,pp_child:43,pago:false,real:false},
     {nome:"Exército de Terracota",pp_adult:18,pp_child:18,pago:false,real:false},
-    {nome:"Comboio G321 Xi'an→Chengdu",pp_adult:35,pp_child:18,pago:false,real:false},
+    {nome:"Comboio G3353 Xi'an→Chengdu",pp_adult:35,pp_child:18,pago:false,real:false},
     {nome:"Panda Base Chengdu",pp_adult:10,pp_child:10,pago:false,real:false},
-    {nome:"Comboio G2445 Chengdu→Zhangjiajie",pp_adult:61,pp_child:31,pago:false,real:false},
+    {nome:"Comboio D368 Chengdu→Chongqing",pp_adult:45,pp_child:23,pago:false,real:false},
+    {nome:"Comboio G3375 Chongqing→Zhangjiajie",pp_adult:40,pp_child:20,pago:false,real:false},
     {nome:"Parque Zhangjiajie",pp_adult:45,pp_child:45,pago:false,real:false},
-    {nome:"Comboio G1367 Zhangjiajie→Xangai",pp_adult:115,pp_child:58,pago:false,real:false},
+    {nome:"Comboio G221 Zhangjiajie→Xangai",pp_adult:115,pp_child:58,pago:false,real:false},
     {nome:"Shanghai Disneyland",pp_adult:82,pp_child:82,pago:false,real:false},
     {nome:"Oriental Pearl Tower",pp_adult:28,pp_child:28,pago:false,real:false},
     {nome:"Alojamento 14 noites",pp_adult:300,pp_child:0,pago:false,real:false}
@@ -913,10 +921,10 @@ function loadFallbackData() {
     {label:"VPN instalada",on:false},
     {label:"SIM card / eSIM",on:false},
     {label:"Seguro de viagem",on:false},
-    {label:"Comboios reservados",on:false}
+    {label:"Comboios reservados",on:true}
   ];
   // Update header with fallback info
-  document.getElementById('hdr-sub').textContent = 'Percurso B · 29 ago – 12 set · 4 pessoas';
+  document.getElementById('hdr-sub').textContent = 'Roteiro confirmado · 29 ago – 12 set · 8 pessoas (modo offline)';
   updateCountdown('2026-08-29');
   renderAll();
   showScreen('main');
@@ -1035,16 +1043,53 @@ function renderSyncBars() {
 }
 
 // ═══ ITINERARY ═══
+// Nomes oficiais em chinês — confirmados manualmente (Ctrip/Baidu Baike) para que a
+// pesquisa no Amap encontre o local certo. Sem isto, o Amap muitas vezes não reconhece
+// nomes em inglês/pinyin de hotéis e estações mais pequenas.
+const STATION_CN = {
+  "Pequim Oeste": "北京西站", "Beijing West": "北京西站",
+  "Xi'an Norte": "西安北站", "Xian Norte": "西安北站", "Xi'an North": "西安北站",
+  "Chengdu Leste": "成都东站", "Chengdu East": "成都东站",
+  "Chongqing Norte": "重庆北站", "Chongqing North": "重庆北站",
+  "Chongqing Leste": "重庆东站", "Chongqing East": "重庆东站",
+  "Zhangjiajie Oeste": "张家界西站", "Zhangjiajie West": "张家界西站",
+  "Xangai Hongqiao": "上海虹桥站", "Shanghai Hongqiao": "上海虹桥站"
+};
+const HOTEL_CN = {
+  "Peace Hotel Beijing": "北京诺富特和平宾馆",
+  "Jin Jiang West Capital International Hotel": "西安锦江西京国际饭店",
+  "Echeng Hotel Chunxi Road Taikoo Li": "怡程酒店(成都春熙路太古里店)",
+  "Pagoda Hotel Jiefangbei Hongya Cave": "大集Pagoda君亭设计酒店",
+  "Paradise Hotel (恬雅智诚酒店)": "恬雅智诚酒店",
+  "Atour Hotel Nanjing East Road The Bund": "上海外滩南京东路亚朵酒店"
+};
+const POI_CN = { ...STATION_CN, ...HOTEL_CN };
+
+function extractHanzi(str) {
+  // Extrai a primeira sequência de caracteres chineses de um texto misto,
+  // ex: "Pequim 北京" → "北京"
+  const m = (str || '').match(/[\u4e00-\u9fff]+/);
+  return m ? m[0] : '';
+}
 function amapCity(d) {
   return (d.hanzi || '').split('→')[0].split('/')[0].trim();
 }
+function amapCityDest(d) {
+  const parts = (d.hanzi || '').split('→');
+  return parts.length > 1 ? parts[1].split('/')[0].trim() : '';
+}
 function amapKeyword(str) {
-  // Remove trailing "HH:MM" and anything after it (e.g. "Pequim Oeste 08:30" → "Pequim Oeste")
+  // Remove trailing "HH:MM" e tudo o que vem a seguir (ex: "Pequim Oeste 08:30" → "Pequim Oeste")
   return (str || '').replace(/\s*\d{1,2}:\d{2}.*$/, '').trim();
 }
 function amapLink(name, city) {
-  const kw = encodeURIComponent(amapKeyword(name));
-  const c = city ? '&city=' + encodeURIComponent(city) : '';
+  // Usa o nome chinês oficial do dicionário sempre que disponível (chave exata ou
+  // após remover a hora); caso contrário usa o texto original como fallback.
+  const key = amapKeyword(name);
+  const cn = POI_CN[key] || POI_CN[(name || '').trim()] || null;
+  const kw = encodeURIComponent(cn || key);
+  const cityHanzi = extractHanzi(city) || city || '';
+  const c = cityHanzi ? '&city=' + encodeURIComponent(cityHanzi) : '';
   return `https://uri.amap.com/search?keyword=${kw}${c}`;
 }
 
@@ -1080,7 +1125,7 @@ function renderItin() {
             <span class="station-warn">⚠ ESTAÇÃO DE CHEGADA</span>
             <div class="station-row">
               <span class="station-name">${amapKeyword(d.travel.p2)}</span>
-              <a class="station-amap" href="${amapLink(d.travel.p2, '')}" target="_blank">📍 Amap</a>
+              <a class="station-amap" href="${amapLink(d.travel.p2, amapCityDest(d))}" target="_blank">📍 Amap</a>
             </div>
             <div class="station-time">${(d.travel.p2.match(/\d{1,2}:\d{2}.*/)||[''])[0]}</div>
           </div>
@@ -1098,7 +1143,7 @@ function renderItin() {
             <div class="atext">${a.txt}</div>
             <div class="arow-links">
               ${a.link ? `<a class="alink" href="${a.link}" target="_blank">Site oficial →</a>` : ''}
-              <a class="alink amap-mini" href="${amapLink(a.txt, amapCity(d))}" target="_blank">📍 Amap</a>
+              <a class="alink amap-mini" href="${amapLink(a.cn ? a.cn.big : a.txt, amapCity(d))}" target="_blank">📍 Amap</a>
             </div>
             ${a.cn ? `<button class="acnbtn" onclick='showCN(${JSON.stringify(a.cn)})'>中 Mostrar em chinês</button>` : ''}
           </div>
@@ -1160,7 +1205,7 @@ function renderHotels() {
               <span class="hotel-addr-warn">⚠ Morada do hotel</span>
               <div class="hotel-addr-text">${o.endereco}</div>
               <div class="hotel-addr-links">
-                <a class="hotel-addr-amap" href="${amapLink(o.nome, h.cidade.split(' ')[0])}" target="_blank">📍 Abrir no Amap</a>
+                <a class="hotel-addr-amap" href="${amapLink(o.nome, extractHanzi(h.cidade))}" target="_blank">📍 Abrir no Amap</a>
                 <a class="hotel-addr-didi" href="https://www.didiglobal.com" target="_blank">🚕 Didi</a>
               </div>
             </div>` : ''}
